@@ -1,0 +1,94 @@
+[tool.poetry]
+name = "idae"
+description = "A PEP 772 implementation"
+authors = ["Bryan Hu <thatxliner@gmail.com>"]
+version = "0.1.0"
+
+readme = "README.md"
+license = "GPL-3.0-or-later"
+
+classifiers = [
+    # Get the list of trove classifiers here: https://pypi.org/classifiers/
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Typing :: Typed",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Natural Language :: English",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
+homepage = "https://github.com/ThatXliner/idae"
+# keywords = ["awesome", "project"]  # Maximum of 5 keywords
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pexpect = "^4.8.0"
+
+[tool.poetry.scripts]
+idae = "idae.__main__:main"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+hypothesis = "^6.68.2"
+mypy = "^1.0.1"
+pytest = "^7.2.1"
+pytest-clarity = "^1.0.1"
+pytest-cov = "^4.0.0"
+ruff = "^0.0.249"
+shed = "^0.10.9"
+
+toml = "^0.10.2"
+
+[tool.poe.tasks]
+# Code linting
+mypy   = {cmd = "mypy idae --strict", help = "Run MyPy on codebase"}
+ruff = {cmd = "ruff check idae", help = "Run Ruff on codebase"}
+check_black = {cmd = "black idae --check"}
+check_imports = {cmd = "ruff check idae --select I"}
+style    = ["check_black", "check_imports"]
+codebase = ["ruff", "mypy"]
+
+    [tool.poe.tasks.format]
+    cmd = "shed"
+    help = "Format code"
+
+    [tool.poe.tasks.fix-ruff]
+    cmd = "ruff idae --fix"
+    help = "Ruff autofix"
+
+    [tool.poe.tasks.lint]
+    sequence = ["style", "codebase"]
+    help = "Lint codebase"
+
+    [tool.poe.tasks.test]
+    cmd = "pytest -vvv --cov=idae"
+    help = "Simply run test suite"
+
+    [tool.poe.tasks.ci]
+    cmd = "pytest -vvv --cov=idae --cov-report=xml"
+    help = "This workflow is for Github Actions"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+# Same as Black.
+line-length = 88
+select = ["ALL"]
+ignore = [
+    # "D",    # "No docs"
+    "T20",  # "Don't use print or pprint"
+    # "ANN",  # Type annotation errors (or the lack of it)
+    "ANN101",  # The type annotation for `self` is inferred
+    "FBT",  # I actually don't know why this exists
+            # and it seems useless so ignore it
+    # Fix doc rule conflicts
+    "D203",
+    "D213"
+]
+target-version = "py38"
+[tool.ruff.per-file-ignores]
+"tests/**/*.py" = ["S101", "D"]
+"docs/conf.py" = ["INP001", "A001"]

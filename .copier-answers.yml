@@ -1,0 +1,12 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v1.1.7
+_src_path: gh:ThatXliner/pyt2
+add_docs: false
+author: Bryan Hu
+email: thatxliner@gmail.com
+is_app: true
+module_name: idae
+project_description: A PEP 772 implementation
+project_name: Idae
+pypi_name: idae
+username: ThatXliner
