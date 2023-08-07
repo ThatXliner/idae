@@ -1,4 +1,4 @@
-# ruff: noqa: S603 (no untrusted)
+# ruff: noqa: S603
 """The main CLI entry point."""
 
 import atexit
@@ -24,7 +24,7 @@ def main() -> None:
     # Create a venv
     venv.create(VENV_NAME, with_pip=True)
     atexit.register(lambda: shutil.rmtree(str(Path(VENV_NAME).resolve())))
-    venv_binary_path = Path(".") / VENV_NAME / "bin"
+    venv_binary_path = Path() / VENV_NAME / "bin"
     # Install dependencies into the venv
     subprocess.run(
         [str((venv_binary_path / "pip").resolve()), "install", *script_deps],
@@ -34,7 +34,7 @@ def main() -> None:
     )
     # The above works according to the Python docs:
     # > You don't specifically need to activate a virtual environment,
-    # > as you can just specify the full path to that environment’s Python interpreter
+    # > as you can just specify the full path to that environment`s Python interpreter
     # > when invoking Python. Furthermore, all scripts installed in the environment
     # > should be runnable without activating it.
     # - https://docs.python.org/3/library/venv.html#how-venvs-work
@@ -48,7 +48,7 @@ def main() -> None:
         dimensions=(terminal.lines, terminal.columns),
     )
 
-    def resize(_, __) -> None:
+    def resize(_, __) -> None:  # noqa: ANN001
         terminal = shutil.get_terminal_size()
         child.setwinsize(terminal.lines, terminal.columns)
 

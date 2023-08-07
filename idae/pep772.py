@@ -1,12 +1,13 @@
 """Slightly modified code from the example in PEP 772."""
 import tokenize
-
-# from packaging.requirements import Requirement
+from typing import Generator
 
 DEPENDENCY_BLOCK_MARKER = "Script Dependencies:"
 
 
-def read_dependency_block(filename):
+def read_dependency_block(filename: str) -> Generator[str]:
+    """Read PEP 772 dependency block."""
+    # ruff: noqa: PLW2901
     # Use the tokenize module to handle any encoding declaration.
     with tokenize.open(filename) as f:
         for line in f:
@@ -21,6 +22,5 @@ def read_dependency_block(filename):
                             continue
                         # Try to convert to a requirement. This will raise
                         # an error if the line is not a PEP 508 requirement
-                        # yield Requirement(line)
                         yield line
                     break
