@@ -71,9 +71,6 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry install
           poetry install  # Second time to install the project
-
-      - name: Build docs
-        run: poe docs
   build:
     runs-on: ubuntu-latest
     steps:
