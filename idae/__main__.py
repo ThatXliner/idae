@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pexpect
 
-from idae.pep772 import read_dependency_block
+from idae.pep723 import read
 
 VENV_NAME = "idae-venv"
 
@@ -20,7 +20,7 @@ def main() -> None:
     """Run the app."""
     # Get scrip dependencies
     script = Path(sys.argv[1]).resolve()
-    script_deps = list(read_dependency_block(str(script)))
+    script_deps = read(str(script.read_text()))["project"]["dependencies"]
     # Create a venv
     venv.create(VENV_NAME, with_pip=True)
     atexit.register(lambda: shutil.rmtree(str(Path(VENV_NAME).resolve())))

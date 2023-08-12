@@ -11,20 +11,23 @@
 [![PyPI](https://img.shields.io/pypi/v/idae)](https://pypi.org/project/idae)
 [![PyPI - License](https://img.shields.io/pypi/l/idae)](#license)
 
-> A [PEP 772](https://peps.python.org/pep-0722/) implementation
+> A [PEP 723](https://peps.python.org/pep-0723/) implementation
 
 ## Usage
 
 Run like normal Python except that the first argument must be a path to the script.
 
-The dependency specification within the Python script must be like the following (example from PEP 772):
+The dependency specification within the Python script must be like the following (example from PEP 723):
 
 ```python
-# In order to run, this script needs the following 3rd party libraries
-#
-## Script Dependencies:
-##    requests
-##    rich
+__pyproject__ = """
+[project]
+requires-python = ">=3.11"
+dependencies = [
+  "requests<3",
+  "rich",
+]
+"""
 
 import requests
 from rich.pretty import pprint
@@ -34,20 +37,13 @@ data = resp.json()
 pprint([(k, v["title"]) for k, v in data.items()][:10])
 ```
 
-Basically, you specify your dependencies using the following comment format:
-
-```python
-## Script Dependencies:
-##    dep-1
-##    dep-2
-##    etc
-```
+Basically, you specify your dependencies in a `__pyproject__` variable in your script, formatted [exactly the same way as the example](https://peps.python.org/pep-0723/#specification) that contains a [TOML](https://toml.io/en/) document. Your dependencies should be in the `project.dependencies` section of the TOML document.
 
 ## How it works
 
 1. Detect script file
 2. Use [venv](https://docs.python.org/3/library/venv.html) to create a temporary virtual environment named `idae-venv` using the Python executable used to run `idae`
-3. Find PEP 772 requirements
+3. Find PEP 773 requirements
 4. Install them into the venv
 5. Run the script within the venv
 6. Delete the venv

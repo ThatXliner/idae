@@ -22,6 +22,7 @@ homepage = "https://github.com/ThatXliner/idae"
 [tool.poetry.dependencies]
 python = "^3.7"
 pexpect = "^4.8.0"
+tomli = { version = "^2.0.1", python = "<3.11" }
 
 [tool.poetry.scripts]
 idae = "idae.__main__:main"
@@ -41,32 +42,32 @@ ruff = "^0.0.282"
 
 [tool.poe.tasks]
 # Code linting
-mypy   = {cmd = "mypy idae --strict", help = "Run MyPy on codebase"}
-ruff = {cmd = "ruff check idae", help = "Run Ruff on codebase"}
-check_black = {cmd = "black idae --check"}
-check_imports = {cmd = "ruff check idae --select I"}
-style    = ["check_black", "check_imports"]
+mypy = { cmd = "mypy idae --strict", help = "Run MyPy on codebase" }
+ruff = { cmd = "ruff check idae", help = "Run Ruff on codebase" }
+check_black = { cmd = "black idae --check" }
+check_imports = { cmd = "ruff check idae --select I" }
+style = ["check_black", "check_imports"]
 codebase = ["ruff", "mypy"]
 
-    [tool.poe.tasks.format]
-    cmd = "shed"
-    help = "Format code"
+[tool.poe.tasks.format]
+cmd = "shed"
+help = "Format code"
 
-    [tool.poe.tasks.fix-ruff]
-    cmd = "ruff idae --fix"
-    help = "Ruff autofix"
+[tool.poe.tasks.fix-ruff]
+cmd = "ruff idae --fix"
+help = "Ruff autofix"
 
-    [tool.poe.tasks.lint]
-    sequence = ["style", "codebase"]
-    help = "Lint codebase"
+[tool.poe.tasks.lint]
+sequence = ["style", "codebase"]
+help = "Lint codebase"
 
-    [tool.poe.tasks.test]
-    cmd = "pytest -vvv --cov=idae"
-    help = "Simply run test suite"
+[tool.poe.tasks.test]
+cmd = "pytest -vvv --cov=idae"
+help = "Simply run test suite"
 
-    [tool.poe.tasks.ci]
-    cmd = "pytest -vvv --cov=idae --cov-report=xml"
-    help = "This workflow is for Github Actions"
+[tool.poe.tasks.ci]
+cmd = "pytest -vvv --cov=idae --cov-report=xml"
+help = "This workflow is for Github Actions"
 
 
 [build-system]
@@ -79,14 +80,14 @@ line-length = 88
 select = ["ALL"]
 ignore = [
     # "D",    # "No docs"
-    "T20",  # "Don't use print or pprint"
+    "T20", # "Don't use print or pprint"
     # "ANN",  # Type annotation errors (or the lack of it)
-    "ANN101",  # The type annotation for `self` is inferred
-    "FBT",  # I actually don't know why this exists
-            # and it seems useless so ignore it
+    "ANN101", # The type annotation for `self` is inferred
+    "FBT",    # I actually don't know why this exists
+    # and it seems useless so ignore it
     # Fix doc rule conflicts
     "D203",
-    "D213"
+    "D213",
 ]
 target-version = "py38"
 [tool.ruff.per-file-ignores]

@@ -1,5 +1,15 @@
-## Script Dependencies:
-##  rich
-import rich
+__pyproject__ = """
+[project]
+requires-python = ">=3.11"
+dependencies = [
+  "requests<3",
+  "rich",
+]
+"""
 
-rich.print("Hello 123")
+import requests
+from rich.pretty import pprint
+
+resp = requests.get("https://peps.python.org/api/peps.json")
+data = resp.json()
+pprint([(k, v["title"]) for k, v in data.items()][:10])
