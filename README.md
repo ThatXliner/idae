@@ -43,7 +43,7 @@ Basically, you specify your dependencies in a `__pyproject__` variable in your s
 
 1. Detect script file
 2. Use [venv](https://docs.python.org/3/library/venv.html) to create a temporary virtual environment named `idae-venv` using the Python executable used to run `idae`
-3. Find PEP 773 requirements
+3. Find PEP 723 requirements
 4. Install them into the venv
 5. Run the script within the venv
 6. Delete the venv
