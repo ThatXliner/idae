@@ -1,5 +1,6 @@
 """Slightly modified code from the example in PEP 723."""
 from __future__ import annotations
+
 import re
 
 try:
