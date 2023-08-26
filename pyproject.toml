@@ -13,7 +13,7 @@ classifiers = [
     "Typing :: Typed",
     "Operating System :: MacOS",
     "Operating System :: POSIX",
-    "Operating System :: UNIX",
+    "Operating System :: Unix",
     "Development Status :: 4 - Beta",
     "Natural Language :: English",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
