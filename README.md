@@ -14,6 +14,9 @@
 
 > A [PEP 723](https://peps.python.org/pep-0723/) implementation
 
+> **Note**
+> Currently this project does not support Windows
+
 ## Usage
 
 Run like normal Python except that the first argument must be a path to the script.
