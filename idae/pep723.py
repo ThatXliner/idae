@@ -9,7 +9,7 @@ try:
 except ModuleNotFoundError:
     import tomli as tomllib  # type: ignore[import, unused-ignore, no-redef]
 COMMENT_BLOCK_REGEX = re.compile(
-    r"^# /// (?P<type>[a-zA-Z0-9-]+)$\s(?P<content>(?:^#.*$\s)+)^# ///$",
+    r"^\s*#\s*///\s*(?P<type>[a-zA-Z0-9-]+)$\s*(?P<content>(?:^#.*$\s)+)^\s*#\s*///$",
     flags=re.MULTILINE,
 )
 COMMENT_REGEX = re.compile(r"^\s*#\s*(.+)$", flags=re.MULTILINE)
