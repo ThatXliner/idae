@@ -12,7 +12,7 @@ REGEX = r'(?ms)^__pyproject__ *= *"""\\?$(.+?)^"""$'
 
 
 def read(script: str) -> dict | None:
-    """Returns the contents of the __pyproject__ variable"""
+    """Return the contents of the __pyproject__ variable."""
     matches = list(re.finditer(REGEX, script))
     if len(matches) > 1:
         msg = "Multiple __pyproject__ definitions found"
