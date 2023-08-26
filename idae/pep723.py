@@ -1,17 +1,17 @@
 """Slightly modified code from the example in PEP 723."""
-from __future__ import annotations
 
 import re
+from typing import Any
 
 try:
-    import tomllib
+    import tomllib  # type: ignore[import]
 except ModuleNotFoundError:
     import tomli as tomllib
 
 REGEX = r'(?ms)^__pyproject__ *= *"""\\?$(.+?)^"""$'
 
 
-def read(script: str) -> dict | None:
+def read(script: str) -> Any:  # noqa: ANN401
     """Return the contents of the __pyproject__ variable."""
     matches = list(re.finditer(REGEX, script))
     if len(matches) > 1:

@@ -9,7 +9,7 @@ import sys
 import venv
 from pathlib import Path
 
-import pexpect
+import pexpect  # type: ignore[import]
 
 from idae.pep723 import read
 
@@ -20,7 +20,8 @@ def main() -> None:
     """Run the app."""
     # Get scrip dependencies
     script = Path(sys.argv[1]).resolve()
-    script_deps = read(str(script.read_text()))["project"]["dependencies"]
+    pyproject = read(str(script.read_text()))
+    script_deps = [] if pyproject is None else pyproject["project"]["dependencies"]
     # Create a venv
     venv.create(VENV_NAME, with_pip=True)
     atexit.register(lambda: shutil.rmtree(str(Path(VENV_NAME).resolve())))
@@ -48,7 +49,7 @@ def main() -> None:
         dimensions=(terminal.lines, terminal.columns),
     )
 
-    def resize(_, __) -> None:  # noqa: ANN001
+    def resize(_: object, __: object) -> None:
         terminal = shutil.get_terminal_size()
         child.setwinsize(terminal.lines, terminal.columns)
 
