@@ -4,9 +4,9 @@ import re
 from typing import Any
 
 try:
-    import tomllib  # type: ignore[import]
+    import tomllib  # type: ignore[import, unused-ignore]
 except ModuleNotFoundError:
-    import tomli as tomllib
+    import tomli as tomllib  # type: ignore[import, unused-ignore, no-redef]
 
 REGEX = r'(?ms)^__pyproject__ *= *"""\\?$(.+?)^"""$'
 
