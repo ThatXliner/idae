@@ -14,9 +14,6 @@
 
 > A [PEP 723](https://peps.python.org/pep-0723/) implementation
 
-> **Note**
-> Currently this project does not support Windows
-
 ## Usage
 
 Run like normal Python except that the first argument must be a path to the script.
@@ -28,14 +25,14 @@ idae example.py
 The dependency specification within the Python script must be like the following (example from PEP 723):
 
 ```python
-__pyproject__ = """
-[project]
-requires-python = ">=3.11"
-dependencies = [
-  "requests<3",
-  "rich",
-]
-"""
+# /// pyproject
+# [run]
+# requires-python = ">=3.11"
+# dependencies = [
+#   "requests<3",
+#   "rich",
+# ]
+# ///
 
 import requests
 from rich.pretty import pprint
@@ -45,7 +42,12 @@ data = resp.json()
 pprint([(k, v["title"]) for k, v in data.items()][:10])
 ```
 
-Basically, you specify your dependencies in a `__pyproject__` variable in your script, formatted [exactly the same way as the example](https://peps.python.org/pep-0723/#specification) that contains a [TOML](https://toml.io/en/) document. Your dependencies should be in the `project.dependencies` section of the TOML document.
+## Caveats
+
+- [Does not support Windows](https://pexpect.readthedocs.io/en/stable/overview.html#pexpect-on-windows)
+- Does not respect `requires-python`
+- Fails silently if the dependencies could not be found
+- Bad UI/UX
 
 ## How it works
 

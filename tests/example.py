@@ -1,11 +1,7 @@
-__pyproject__ = """
-[project]
-requires-python = ">=3.11"
-dependencies = [
-  "requests<3",
-  "rich",
-]
-"""
+# /// pyproject
+#   "requests<3",
+#   "rich",
+# ///
 
 import requests
 from rich.pretty import pprint

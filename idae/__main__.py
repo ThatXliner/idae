@@ -21,7 +21,7 @@ def main() -> None:
     # Get scrip dependencies
     script = Path(sys.argv[1]).resolve()
     pyproject = read(str(script.read_text()))
-    script_deps = [] if pyproject is None else pyproject["project"]["dependencies"]
+    script_deps = [] if pyproject is None else pyproject["run"]["dependencies"]
     # Create a venv
     venv.create(VENV_NAME, with_pip=True)
     atexit.register(lambda: shutil.rmtree(str(Path(VENV_NAME).resolve())))
