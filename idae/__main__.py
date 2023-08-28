@@ -26,13 +26,14 @@ def main() -> None:
     venv.create(VENV_NAME, with_pip=True)
     atexit.register(lambda: shutil.rmtree(str(Path(VENV_NAME).resolve())))
     venv_binary_path = Path() / VENV_NAME / "bin"
-    # Install dependencies into the venv
-    subprocess.run(
-        [str((venv_binary_path / "pip").resolve()), "install", *script_deps],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        check=True,
-    )
+    # Install dependencies into the venv (if any)
+    if script_deps:
+        subprocess.run(
+            [str((venv_binary_path / "pip").resolve()), "install", *script_deps],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            check=True,
+        )
     # The above works according to the Python docs:
     # > You don't specifically need to activate a virtual environment,
     # > as you can just specify the full path to that environment`s Python interpreter
