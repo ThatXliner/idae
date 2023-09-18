@@ -38,7 +38,7 @@ def patched_init(self, *args, **kwargs):
 
 
 def test_main(monkeypatch):
-    monkeypatch.setattr(sys, "argv", ["idae", "tests/example.py"])
+    monkeypatch.setattr(sys, "argv", ["idae", "tests/examples/rich_requests.py"])
     monkeypatch.setattr(
         pexpect.spawn,
         "interact",
