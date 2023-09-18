@@ -2,7 +2,7 @@
 name = "idae"
 description = "A PEP 772 implementation"
 authors = ["Bryan Hu <thatxliner@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 readme = "README.md"
 license = "GPL-3.0-or-later"
