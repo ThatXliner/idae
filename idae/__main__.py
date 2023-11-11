@@ -12,6 +12,7 @@ from pathlib import Path
 import pexpect  # type: ignore[import]
 
 from idae.pep723 import read
+import findpython
 
 VENV_NAME = "idae-venv"
 
@@ -21,9 +22,16 @@ def main() -> None:
     # Get scrip dependencies
     script = Path(sys.argv[1]).resolve()
     pyproject = read(str(script.read_text()))
-    script_deps = [] if pyproject is None else pyproject["run"]["dependencies"]
+    script_deps = []
+    python = sys.executable
+    if pyproject is not None and "run" in pyproject:
+        script_deps = pyproject["run"]["dependencies"]
+        python = findpython.find(pyproject["run"]["requires-python"]).executable
     # Create a venv
-    venv.create(VENV_NAME, with_pip=True)
+    subprocess.run(
+        [python, "-m", "venv", VENV_NAME],
+        check=True,
+    )
     atexit.register(lambda: shutil.rmtree(str(Path(VENV_NAME).resolve())))
     venv_binary_path = Path() / VENV_NAME / "bin"
     # Install dependencies into the venv (if any)
