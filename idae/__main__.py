@@ -6,13 +6,13 @@ import signal
 import sys
 from pathlib import Path
 
+import findpython
 import pexpect  # type: ignore[import]
 from packaging.requirements import Requirement
 from packaging.version import Version
 
 from idae.pep723 import read
-from idae.venv import clean_venvs, get_venv, Python
-import findpython
+from idae.venv import Python, clean_venvs, get_venv
 
 
 def main() -> None:
@@ -39,11 +39,16 @@ def main() -> None:
             if pyproject is None
             else list(map(Requirement, pyproject["run"]["dependencies"]))
         )
-        python_executable = findpython.find(pyproject["run"]["requires-python"])
-        if not python_executable:
+        python = findpython.find(pyproject["run"]["requires-python"])
+        if not python:
             msg = f"Could not find Python version {pyproject['run']['requires-python']}"
             raise RuntimeError(msg)
-        python_version = Version(pyproject["run"]["requires-python"])
+        python_version = python.version
+        # python.executable may be a symlink
+        # which shouldn't cause problems.
+        # If it does, then change this code to use
+        # python.real_path
+        python_executable = str(python.executable)
 
     venv_path = get_venv(
         script_deps,

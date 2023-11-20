@@ -3,14 +3,12 @@ from __future__ import annotations
 
 import shutil
 import subprocess
-from dataclases import dataclass
-import venv
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import platformdirs
 
 if TYPE_CHECKING:
-    from typing import Callable
     from pathlib import Path
 
     from packaging.requirements import Requirement
