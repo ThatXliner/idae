@@ -1,3 +1,4 @@
+#!/usr/bin/env idae
 # /// pyproject
 # [run]
 # requires-python = ">=3.11"

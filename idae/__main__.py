@@ -1,51 +1,48 @@
 # ruff: noqa: S603
 """The main CLI entry point."""
 
-import atexit
 import shutil
 import signal
-import subprocess
 import sys
-import venv
 from pathlib import Path
 
 import pexpect  # type: ignore[import]
+from packaging.requirements import Requirement
+from packaging.version import Version
 
 from idae.pep723 import read
-
-VENV_NAME = "idae-venv"
+from idae.venv import clean_venvs, get_venv
 
 
 def main() -> None:
     """Run the app."""
+    if len(sys.argv) != 2:  # noqa: PLR2004
+        print(f"Usage: {sys.argv[0]} (<script>|clean)")
+        sys.exit(1)
+
+    if sys.argv[1] == "clean":
+        clean_venvs()
+        return
+
     # Get scrip dependencies
     script = Path(sys.argv[1]).resolve()
     pyproject = read(str(script.read_text()))
-    script_deps = [] if pyproject is None else pyproject["run"]["dependencies"]
-    # Create a venv
-    venv.create(VENV_NAME, with_pip=True)
-    atexit.register(lambda: shutil.rmtree(str(Path(VENV_NAME).resolve())))
-    venv_binary_path = Path() / VENV_NAME / "bin"
-    # Install dependencies into the venv (if any)
-    if script_deps:
-        subprocess.run(
-            [str((venv_binary_path / "pip").resolve()), "install", *script_deps],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            check=True,
-        )
-    # The above works according to the Python docs:
-    # > You don't specifically need to activate a virtual environment,
-    # > as you can just specify the full path to that environment`s Python interpreter
-    # > when invoking Python. Furthermore, all scripts installed in the environment
-    # > should be runnable without activating it.
-    # - https://docs.python.org/3/library/venv.html#how-venvs-work
+    script_deps = tuple(
+        () if pyproject is None else map(Requirement, pyproject["run"]["dependencies"]),
+    )
+    # Create or fetch a cached venv
+    # TODO(ThatXliner): get from requires-python
+    # https://github.com/ThatXliner/idae/issues/2
+    py_ver = Version(
+        f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+    )
+    venv_path = get_venv(script_deps, py_ver)
 
     # Run the script inside the venv
     terminal = shutil.get_terminal_size()
     # Copied from poetry source, slightly modified
     child = pexpect.spawn(
-        str((venv_binary_path / "python").resolve()),
+        str((venv_path / "bin/python").resolve()),
         sys.argv[1:],
         dimensions=(terminal.lines, terminal.columns),
     )
