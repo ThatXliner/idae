@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 import platformdirs
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from pathlib import Path
 
     from packaging.requirements import Requirement
@@ -19,7 +20,7 @@ from .dependencies import hash_dependencies
 CACHE_DIR = platformdirs.user_cache_path("idae")
 
 
-def get_venv(requirements: list[Requirement], python_version: Version) -> Path:
+def get_venv(requirements: Sequence[Requirement], python_version: Version) -> Path:
     """Create or fetch a cached venv."""
     dep_hash = hash_dependencies(requirements)
     venv_path = CACHE_DIR / f"{python_version.major}.{python_version.minor}" / dep_hash
