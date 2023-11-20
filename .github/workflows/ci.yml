@@ -88,6 +88,6 @@ jobs:
       - name: Run style lints
         run: poe style
       - name: Run ruff lints
-        run: poe codebase
+        run: poe ruff
       - name: Run mypy lints
         run: poe mypy
