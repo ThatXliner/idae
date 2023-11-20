@@ -11,7 +11,8 @@ from packaging.requirements import Requirement
 from packaging.version import Version
 
 from idae.pep723 import read
-from idae.venv import clean_venvs, get_venv
+from idae.venv import clean_venvs, get_venv, Python
+import findpython
 
 
 def main() -> None:
@@ -27,18 +28,27 @@ def main() -> None:
     # Get scrip dependencies
     script = Path(sys.argv[1]).resolve()
     pyproject = read(str(script.read_text()))
-    script_deps = (
-        []
-        if pyproject is None
-        else list(map(Requirement, pyproject["run"]["dependencies"]))
-    )
-    # Create or fetch a cached venv
-    # TODO(ThatXliner): get from requires-python
-    # https://github.com/ThatXliner/idae/issues/2
-    py_ver = Version(
+    script_deps = []
+    python_version = Version(
         f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
     )
-    venv_path = get_venv(script_deps, py_ver)
+    python_executable = sys.executable
+    if pyproject is not None and "run" in pyproject:
+        script_deps = (
+            []
+            if pyproject is None
+            else list(map(Requirement, pyproject["run"]["dependencies"]))
+        )
+        python_executable = findpython.find(pyproject["run"]["requires-python"])
+        if not python_executable:
+            msg = f"Could not find Python version {pyproject['run']['requires-python']}"
+            raise RuntimeError(msg)
+        python_version = Version(pyproject["run"]["requires-python"])
+
+    venv_path = get_venv(
+        script_deps,
+        Python(version=python_version, executable=python_executable),
+    )
 
     # Run the script inside the venv
     terminal = shutil.get_terminal_size()

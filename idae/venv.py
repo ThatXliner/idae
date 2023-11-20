@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+from dataclases import dataclass
 import venv
 from typing import TYPE_CHECKING
 
 import platformdirs
 
 if TYPE_CHECKING:
+    from typing import Callable
     from pathlib import Path
 
     from packaging.requirements import Requirement
@@ -19,14 +21,27 @@ from .dependencies import hash_dependencies
 CACHE_DIR = platformdirs.user_cache_path("idae")
 
 
-def get_venv(requirements: list[Requirement], python_version: Version) -> Path:
+@dataclass
+class Python:
+    """Object representing a Python executable."""
+
+    version: Version
+    executable: str
+
+
+def get_venv(requirements: list[Requirement], python: Python) -> Path:
     """Create or fetch a cached venv."""
     dep_hash = hash_dependencies(requirements)
-    venv_path = CACHE_DIR / f"{python_version.major}.{python_version.minor}" / dep_hash
+    venv_path = CACHE_DIR / f"{python.version.major}.{python.version.minor}" / dep_hash
     if venv_path.is_dir():
         return venv_path
-
-    venv.create(venv_path, with_pip=True)
+    # This automatically includes pip
+    subprocess.run(
+        [python.executable, "-m", "venv", venv_path],  # noqa: S603
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=True,
+    )
     # Install dependencies into the venv (if any)
     if requirements:
         subprocess.run(
