@@ -33,7 +33,9 @@ def main() -> None:
     # Create or fetch a cached venv
     # TODO(ThatXliner): get from requires-python
     # https://github.com/ThatXliner/idae/issues/2
-    py_ver = Version(sys.version_info)
+    py_ver = Version(
+        f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+    )
     venv_path = get_venv(script_deps, py_ver)
 
     # Run the script inside the venv
