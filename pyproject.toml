@@ -90,6 +90,7 @@ ignore = [
     # Fix doc rule conflicts
     "D203",
     "D213",
+    "FIX002",  # `TODO` comments are fine when linking to issues
 ]
 target-version = "py38"
 extend-exclude = ["tests/examples/*.py"]
