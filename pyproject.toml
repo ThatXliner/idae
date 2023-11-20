@@ -25,6 +25,8 @@ homepage = "https://github.com/ThatXliner/idae"
 python = "^3.7"
 pexpect = "^4.8.0"
 tomli = { version = "^2.0.1", python = "<3.11" }
+platformdirs = ">=4.0.0"
+packaging = ">=23.2"
 
 [tool.poetry.scripts]
 idae = "idae.__main__:main"
