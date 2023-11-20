@@ -39,16 +39,19 @@ def main() -> None:
             if pyproject is None
             else list(map(Requirement, pyproject["run"]["dependencies"]))
         )
-        python = findpython.find(pyproject["run"]["requires-python"])
-        if not python:
-            msg = f"Could not find Python version {pyproject['run']['requires-python']}"
-            raise RuntimeError(msg)
-        python_version = python.version
-        # python.executable may be a symlink
-        # which shouldn't cause problems.
-        # If it does, then change this code to use
-        # python.real_path
-        python_executable = str(python.executable)
+        if "requires-python" in pyproject["run"]:
+            python = findpython.find(pyproject["run"]["requires-python"])
+            # TODO(ThatXliner): A flag for ignoring this
+            # https://github.com/ThatXliner/idae/issues/1
+            if not python:
+                msg = f"Python version {pyproject['run']['requires-python']} not found"
+                raise RuntimeError(msg)
+            python_version = python.version
+            # python.executable may be a symlink
+            # which shouldn't cause problems.
+            # If it does, then change this code to use
+            # python.real_path
+            python_executable = str(python.executable)
 
     venv_path = get_venv(
         script_deps,
