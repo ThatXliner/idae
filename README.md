@@ -12,7 +12,9 @@
 [![PyPI](https://img.shields.io/pypi/v/idae)](https://pypi.org/project/idae)
 [![PyPI - License](https://img.shields.io/pypi/l/idae)](#license)
 
-> A [PEP 723](https://peps.python.org/pep-0723/) implementation
+> A [PEP 723][] implementation
+
+[PEP 723]: https://peps.python.org/pep-0723/
 
 ## Usage
 
@@ -22,9 +24,10 @@ Run like normal Python except that the first argument must be a path to the scri
 idae example.py
 ```
 
-The dependency specification within the Python script must be like the following (example from PEP 723):
+The dependency specification within the Python script must be like the following (example from [PEP 723][]):
 
 ```python
+#!/usr/bin/env idae
 # /// pyproject
 # [run]
 # requires-python = ">=3.11"
@@ -52,11 +55,15 @@ pprint([(k, v["title"]) for k, v in data.items()][:10])
 ## How it works
 
 1. Detect script file
-2. Use [venv](https://docs.python.org/3/library/venv.html) to create a temporary virtual environment named `idae-venv` using the Python executable used to run `idae`
-3. Find PEP 723 requirements
+2. Use [venv][] to create a temporary virtual environment in the [user cache directory][] using the Python executable used to run `idae`
+3. Find [PEP 723][] requirements
 4. Install them into the venv
 5. Run the script within the venv
-6. Delete the venv
+
+Whenever you want run `idae clean` to remove all cached environments to free up space.
+
+[venv]: https://docs.python.org/3/library/venv.html
+[user cache directory]: https://platformdirs.readthedocs.io/en/latest/api.html#cache-directory
 
 ## Installation
 
