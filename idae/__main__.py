@@ -36,7 +36,7 @@ def main() -> None:
     if pyproject is not None and "run" in pyproject:
         script_deps = (
             []
-            if pyproject is None
+            if "dependencies" not in pyproject["run"]
             else list(map(Requirement, pyproject["run"]["dependencies"]))
         )
         if "requires-python" in pyproject["run"]:
