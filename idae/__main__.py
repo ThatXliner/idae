@@ -27,8 +27,10 @@ def main() -> None:
     # Get scrip dependencies
     script = Path(sys.argv[1]).resolve()
     pyproject = read(str(script.read_text()))
-    script_deps = tuple(
-        () if pyproject is None else map(Requirement, pyproject["run"]["dependencies"]),
+    script_deps = (
+        []
+        if pyproject is None
+        else list(map(Requirement, pyproject["run"]["dependencies"]))
     )
     # Create or fetch a cached venv
     # TODO(ThatXliner): get from requires-python
