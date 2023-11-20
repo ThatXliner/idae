@@ -41,7 +41,9 @@ def patched_init(self, *args, **kwargs):
 def test_main(monkeypatch):
     if sys.version_info < (3, 11):
         monkeypatch.setattr(
-            sys, "argv", ["idae", "tests/examples/rich_requests_big_python.py"]
+            sys,
+            "argv",
+            ["idae", "tests/examples/rich_requests_big_python.py"],
         )
         monkeypatch.setattr(
             pexpect.spawn,

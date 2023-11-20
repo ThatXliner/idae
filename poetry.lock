@@ -686,6 +686,23 @@ files = [
 ]
 
 [[package]]
+name = "resolvelib"
+version = "1.0.1"
+description = "Resolve abstract dependencies into concrete ones"
+optional = false
+python-versions = "*"
+files = [
+    {file = "resolvelib-1.0.1-py2.py3-none-any.whl", hash = "sha256:d2da45d1a8dfee81bdd591647783e340ef3bcb104b54c383f70d422ef5cc7dbf"},
+    {file = "resolvelib-1.0.1.tar.gz", hash = "sha256:04ce76cbd63fded2078ce224785da6ecd42b9564b1390793f64ddecbe997b309"},
+]
+
+[package.extras]
+examples = ["html5lib", "packaging", "pygraphviz", "requests"]
+lint = ["black", "flake8", "isort", "mypy", "types-requests"]
+release = ["build", "towncrier", "twine"]
+test = ["commentjson", "packaging", "pytest"]
+
+[[package]]
 name = "rich"
 version = "13.5.2"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
@@ -887,4 +904,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "b19761f8b756ac929a76b8be4899851d085e52e48f98015ff0fc82997723d97d"
+content-hash = "3c3b39d13215e9db366539b24f4ee31b180cf9aea0419cb3052e8bdba1ef9131"

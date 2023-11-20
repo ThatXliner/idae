@@ -28,6 +28,7 @@ tomli = { version = "^2.0.1", python = "<3.11" }
 platformdirs = ">=4.0.0"
 packaging = ">=23.2"
 findpython = "^0.4.0"
+resolvelib = "^1.0.1"
 
 [tool.poetry.scripts]
 idae = "idae.__main__:main"

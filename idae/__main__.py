@@ -6,13 +6,13 @@ import signal
 import sys
 from pathlib import Path
 
-import findpython
 import pexpect  # type: ignore[import]
 from packaging.requirements import Requirement
 from packaging.version import Version
 
 from idae.pep723 import read
 from idae.venv import Python, clean_venvs, get_venv
+from idae.resolver import get_python
 
 
 def main() -> None:
@@ -40,7 +40,7 @@ def main() -> None:
             else list(map(Requirement, pyproject["run"]["dependencies"]))
         )
         if "requires-python" in pyproject["run"]:
-            python = findpython.find(pyproject["run"]["requires-python"])
+            python = get_python(pyproject["run"]["requires-python"])
             # TODO(ThatXliner): A flag for ignoring this
             # https://github.com/ThatXliner/idae/issues/1
             if not python:
