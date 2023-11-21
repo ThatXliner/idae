@@ -39,33 +39,35 @@ def patched_init(self, *args, **kwargs):
 
 
 def test_main(monkeypatch):
-    if sys.version_info < (3, 11):
-        monkeypatch.setattr(
-            sys,
-            "argv",
-            ["idae", "tests/examples/rich_requests_big_python.py"],
-        )
-        monkeypatch.setattr(
-            pexpect.spawn,
-            "interact",
-            lambda self, *_, **__: self.expect(EXAMPLE_OUTPUT),
-        )
-        original_init = pexpect.spawn.__init__
-        monkeypatch.setattr(pexpect.spawn, "__init__", patched_init)
-        pexpect.spawn._original_init = original_init  # noqa: SLF001
-        if sys.version_info < (3, 8):  # noqa: UP036
-            with pytest.raises(RuntimeError):
-                main()
-        else:
-            main()
-    else:
-        monkeypatch.setattr(sys, "argv", ["idae", "tests/examples/rich_requests.py"])
-        monkeypatch.setattr(
-            pexpect.spawn,
-            "interact",
-            lambda self, *_, **__: self.expect(EXAMPLE_OUTPUT),
-        )
-        original_init = pexpect.spawn.__init__
-        monkeypatch.setattr(pexpect.spawn, "__init__", patched_init)
-        pexpect.spawn._original_init = original_init  # noqa: SLF001
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["idae", "tests/examples/rich_requests.py"],
+    )
+    monkeypatch.setattr(
+        pexpect.spawn,
+        "interact",
+        lambda self, *_, **__: self.expect(EXAMPLE_OUTPUT),
+    )
+    original_init = pexpect.spawn.__init__
+    monkeypatch.setattr(pexpect.spawn, "__init__", patched_init)
+    pexpect.spawn._original_init = original_init  # noqa: SLF001
+    main()
+
+
+def test_impossible_python(monkeypatch):
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["idae", "tests/examples/impossible_python.py"],
+    )
+    monkeypatch.setattr(
+        pexpect.spawn,
+        "interact",
+        lambda self, *_, **__: self.expect(EXAMPLE_OUTPUT),
+    )
+    original_init = pexpect.spawn.__init__
+    monkeypatch.setattr(pexpect.spawn, "__init__", patched_init)
+    pexpect.spawn._original_init = original_init  # noqa: SLF001
+    with pytest.raises(RuntimeError):
         main()
