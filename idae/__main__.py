@@ -62,7 +62,7 @@ def main() -> None:
     terminal = shutil.get_terminal_size()
     # Copied from poetry source, slightly modified
     child = pexpect.spawn(
-        str((venv_path / "bin/python")),
+        str(venv_path / "bin/python"),
         sys.argv[1:],
         dimensions=(terminal.lines, terminal.columns),
     )
