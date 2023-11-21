@@ -48,19 +48,19 @@ pprint([(k, v["title"]) for k, v in data.items()][:10])
 ## Caveats
 
 - [Does not support Windows](https://pexpect.readthedocs.io/en/stable/overview.html#pexpect-on-windows)
-- [Does not respect `requires-python`](https://github.com/ThatXliner/idae/issues/2)
 - Fails silently if the dependencies could not be found
 - [Crappy interface](https://github.com/ThatXliner/idae/issues/1)
 
 ## How it works
 
 1. Detect script file
-2. Use [venv][] to create a temporary virtual environment in the [user cache directory][] using the Python executable used to run `idae`
-3. Find [PEP 723][] requirements
-4. Install them into the venv
-5. Run the script within the venv
+2. Detect appropriate Python executable
+3. Use [venv][] to create a temporary virtual environment in the [user cache directory][] using the executable detected
+4. Find [PEP 723][] `pip` requirements
+5. Install them into the virtual environment
+6. Run the script within the virtual environment
 
-Whenever you want run `idae clean` to remove all cached environments to free up space.
+Run `idae clean` to remove all cached environments to free up space. Environments are cached per set of requirements.
 
 [venv]: https://docs.python.org/3/library/venv.html
 [user cache directory]: https://platformdirs.readthedocs.io/en/latest/api.html#cache-directory

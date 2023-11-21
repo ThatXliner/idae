@@ -11,7 +11,8 @@ from packaging.requirements import Requirement
 from packaging.version import Version
 
 from idae.pep723 import read
-from idae.venv import clean_venvs, get_venv
+from idae.resolver import get_python
+from idae.venv import Python, clean_venvs, get_venv
 
 
 def main() -> None:
@@ -27,24 +28,41 @@ def main() -> None:
     # Get scrip dependencies
     script = Path(sys.argv[1]).resolve()
     pyproject = read(str(script.read_text()))
-    script_deps = (
-        []
-        if pyproject is None
-        else list(map(Requirement, pyproject["run"]["dependencies"]))
-    )
-    # Create or fetch a cached venv
-    # TODO(ThatXliner): get from requires-python
-    # https://github.com/ThatXliner/idae/issues/2
-    py_ver = Version(
+    script_deps = []
+    python_version = Version(
         f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
     )
-    venv_path = get_venv(script_deps, py_ver)
+    python_executable = sys.executable
+    if pyproject is not None and "run" in pyproject:
+        script_deps = (
+            []
+            if "dependencies" not in pyproject["run"]
+            else list(map(Requirement, pyproject["run"]["dependencies"]))
+        )
+        if "requires-python" in pyproject["run"]:
+            python = get_python(pyproject["run"]["requires-python"])
+            # TODO(ThatXliner): A flag for ignoring this
+            # https://github.com/ThatXliner/idae/issues/1
+            if not python:
+                msg = f"Python version {pyproject['run']['requires-python']} not found"
+                raise RuntimeError(msg)
+            python_version = python.version
+            # python.executable may be a symlink
+            # which shouldn't cause problems.
+            # If it does, then change this code to use
+            # python.real_path
+            python_executable = str(python.executable)
+
+    venv_path = get_venv(
+        script_deps,
+        Python(version=python_version, executable=python_executable),
+    )
 
     # Run the script inside the venv
     terminal = shutil.get_terminal_size()
     # Copied from poetry source, slightly modified
     child = pexpect.spawn(
-        str((venv_path / "bin/python").resolve()),
+        str(venv_path / "bin/python"),
         sys.argv[1:],
         dimensions=(terminal.lines, terminal.columns),
     )
