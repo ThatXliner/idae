@@ -10,7 +10,6 @@ def get_python(version: str) -> findpython.PythonVersion | None:
     """Resolve the version string."""
     # Order from latest version to earliest
     pythons = {python.version: python for python in findpython.find_all()}
-    print(pythons)
     target = SpecifierSet(version)
     for python_version, python in pythons.items():
         if python_version in target:
