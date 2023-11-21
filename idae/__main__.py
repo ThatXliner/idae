@@ -11,8 +11,8 @@ from packaging.requirements import Requirement
 from packaging.version import Version
 
 from idae.pep723 import read
-from idae.venv import Python, clean_venvs, get_venv
 from idae.resolver import get_python
+from idae.venv import Python, clean_venvs, get_venv
 
 
 def main() -> None:
