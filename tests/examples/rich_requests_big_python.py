@@ -1,7 +1,7 @@
 #!/usr/bin/env idae
 # /// pyproject
 # [run]
-# requires-python = ">=3.7"
+# requires-python = ">=3.8"
 # dependencies = [
 #   "requests<3",
 #   "rich",
