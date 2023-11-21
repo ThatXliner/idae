@@ -40,6 +40,8 @@ def get_normalized_dependencies(requirements: list[Requirement]) -> list[str]:
     return sorted(normalized_dependencies)
 
 
+# TODO(ThatXliner): Better caching by resolving the deps
+# https://github.com/ThatXliner/idae/issues/8
 def hash_dependencies(requirements: list[Requirement]) -> str:
     """Create a hash of the dependencies."""
     from hashlib import sha256

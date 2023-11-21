@@ -3,8 +3,12 @@ import sys
 
 import pexpect
 import pytest
+import platformdirs
+import shutil
 
 from idae.__main__ import main
+
+CACHE_DIR = platformdirs.user_cache_path("idae")
 
 EXAMPLE_OUTPUT_WITH_COLOR = """\033[1m[\033[0m
 \033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'1'\033[0m, \033[32m'PEP Purpose and Guidelines'\033[0m\033[1m)\033[0m,
@@ -38,6 +42,13 @@ def patched_init(self, *args, **kwargs):
     self._original_init(*args, **kwargs)
 
 
+@pytest.fixture()
+def empty_cache() -> None:
+    if CACHE_DIR.is_dir():
+        shutil.rmtree(CACHE_DIR, ignore_errors=True)
+
+
+@pytest.mark.usefixtures("empty_cache")
 def test_main(monkeypatch):
     monkeypatch.setattr(
         sys,
@@ -55,6 +66,7 @@ def test_main(monkeypatch):
     main()
 
 
+@pytest.mark.usefixtures("empty_cache")
 def test_impossible_python(monkeypatch):
     monkeypatch.setattr(
         sys,
@@ -71,3 +83,37 @@ def test_impossible_python(monkeypatch):
     pexpect.spawn._original_init = original_init  # noqa: SLF001
     with pytest.raises(RuntimeError):
         main()
+
+
+@pytest.mark.usefixtures("empty_cache")
+def test_cache(monkeypatch):
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["idae", "tests/examples/cache_test_1.py"],
+    )
+    monkeypatch.setattr(
+        pexpect.spawn,
+        "interact",
+        lambda self, *_, **__: self.expect(["<h1>Hello world</h1>", pexpect.EOF])
+        and self.close(),
+    )
+    original_init = pexpect.spawn.__init__
+    monkeypatch.setattr(pexpect.spawn, "__init__", patched_init)
+    pexpect.spawn._original_init = original_init  # noqa: SLF001
+    main()
+
+    cache_dir_python = next(iter(CACHE_DIR.glob("**/python"))).parent.parent.parent
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["idae", "tests/examples/cache_test_2.py"],
+    )
+    monkeypatch.setattr(
+        pexpect.spawn,
+        "interact",
+        lambda self, *_, **__: self.expect(["<sub>Bye world</sub>", pexpect.EOF]),
+    )
+    main()
+    # Assert that it was cached
+    assert len(list(cache_dir_python.glob("*"))) == 1
