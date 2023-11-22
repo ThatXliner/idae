@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 import platformdirs
 
 if TYPE_CHECKING:
+    from os import PathLike
     from pathlib import Path
 
     from packaging.requirements import Requirement
@@ -24,7 +25,7 @@ class Python:
     """Object representing a Python executable."""
 
     version: Version
-    executable: str
+    executable: str | PathLike
 
 
 def get_venv(requirements: list[Requirement], python: Python) -> Path:

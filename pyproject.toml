@@ -29,9 +29,10 @@ platformdirs = ">=4.0.0"
 packaging = ">=23.2"
 findpython = "^0.4.0"
 resolvelib = "^1.0.1"
+typer = { extras = ["all"], version = "^0.9.0" }
 
 [tool.poetry.scripts]
-idae = "idae.__main__:main"
+idae = "idae.cli:cli"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -94,7 +95,7 @@ ignore = [
     # Fix doc rule conflicts
     "D203",
     "D213",
-    "FIX002",  # `TODO` comments are fine when linking to issues
+    "FIX002", # `TODO` comments are fine when linking to issues
 ]
 target-version = "py38"
 extend-exclude = ["tests/examples/*.py"]
