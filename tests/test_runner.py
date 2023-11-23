@@ -1,10 +1,15 @@
 # ruff: noqa: ANN003, ANN002, ANN001, ANN201
-import sys
+
+from typer.testing import CliRunner
+
+from idae.cli import cli, run
+import pytest
+import typer
 
 import pexpect
-import pytest
+from pathlib import Path
 
-from idae.__main__ import main
+runner = CliRunner(mix_stderr=False)
 
 EXAMPLE_OUTPUT_WITH_COLOR = """\033[1m[\033[0m
 \033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'1'\033[0m, \033[32m'PEP Purpose and Guidelines'\033[0m\033[1m)\033[0m,
@@ -40,11 +45,6 @@ def patched_init(self, *args, **kwargs):
 
 def test_main(monkeypatch):
     monkeypatch.setattr(
-        sys,
-        "argv",
-        ["idae", "tests/examples/rich_requests.py"],
-    )
-    monkeypatch.setattr(
         pexpect.spawn,
         "interact",
         lambda self, *_, **__: self.expect(EXAMPLE_OUTPUT),
@@ -52,22 +52,16 @@ def test_main(monkeypatch):
     original_init = pexpect.spawn.__init__
     monkeypatch.setattr(pexpect.spawn, "__init__", patched_init)
     pexpect.spawn._original_init = original_init  # noqa: SLF001
-    main()
+    with pytest.raises(typer.Exit) as exc_info:
+        run(Path("tests/examples/rich_requests.py"))
+    assert exc_info.value.args == 0, exc_info
 
 
-def test_impossible_python(monkeypatch):
-    monkeypatch.setattr(
-        sys,
-        "argv",
-        ["idae", "tests/examples/impossible_python.py"],
+def test_impossible_python():
+    result = runner.invoke(
+        cli,
+        ["run", "tests/examples/impossible_python.py"],
     )
-    monkeypatch.setattr(
-        pexpect.spawn,
-        "interact",
-        lambda self, *_, **__: self.expect(EXAMPLE_OUTPUT),
-    )
-    original_init = pexpect.spawn.__init__
-    monkeypatch.setattr(pexpect.spawn, "__init__", patched_init)
-    pexpect.spawn._original_init = original_init  # noqa: SLF001
-    with pytest.raises(RuntimeError):
-        main()
+    print(result)
+    assert result.exit_code == 1
+    assert "not found" in result.stderr

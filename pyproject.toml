@@ -23,7 +23,6 @@ homepage = "https://github.com/ThatXliner/idae"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-pexpect = "^4.8.0"
 tomli = { version = "^2.0.1", python = "<3.11" }
 platformdirs = ">=4.0.0"
 packaging = ">=23.2"
@@ -46,6 +45,7 @@ shed = "^0.10.9"
 
 toml = "^0.10.2"
 ruff = "^0.0.282"
+pexpect = "^4.8.0"
 
 [tool.poe.tasks]
 # Code linting
