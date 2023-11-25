@@ -27,7 +27,6 @@ tomli = { version = "^2.0.1", python = "<3.11" }
 platformdirs = ">=4.0.0"
 packaging = ">=23.2"
 findpython = "^0.4.0"
-resolvelib = "^1.0.1"
 typer = { extras = ["all"], version = "^0.9.0" }
 
 [tool.poetry.scripts]
@@ -45,7 +44,6 @@ shed = "^0.10.9"
 
 toml = "^0.10.2"
 ruff = "^0.0.282"
-pexpect = "^4.8.0"
 
 [tool.poe.tasks]
 # Code linting
