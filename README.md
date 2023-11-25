@@ -47,7 +47,6 @@ pprint([(k, v["title"]) for k, v in data.items()][:10])
 
 ## Caveats
 
-- [Does not support Windows](https://pexpect.readthedocs.io/en/stable/overview.html#pexpect-on-windows)
 - Fails silently if the dependencies could not be found
 - [Crappy interface](https://github.com/ThatXliner/idae/issues/1)
 
