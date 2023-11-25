@@ -61,8 +61,7 @@ idae script.py -- I am --help
 
 ## Caveats
 
-- [Does not support Windows](https://pexpect.readthedocs.io/en/stable/overview.html#pexpect-on-windows)
-- Fails silently if the dependencies could not be found
+- [No logging, or very minimal output reporting](https://github.com/ThatXliner/idae/issues/10)
 
 ## How it works
 
