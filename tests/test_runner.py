@@ -57,7 +57,7 @@ def test_args(capfd):
     assert result.exit_code == 0
     # We have to use this instead of result.stdout
     # As Click doesn't capture the stdin fileno
-    assert out == "hello world"
+    assert out == "hello world\n"
 
 
 def test_exotic_args(capfd):
