@@ -1,11 +1,9 @@
 """CLI interface."""
-from __future__ import annotations
-
 import itertools
 import shlex
 import subprocess
 import sys
-from pathlib import Path  # noqa: TCH003  # Likely required for Typer
+from pathlib import Path
 from typing import List, Optional
 
 import typer
@@ -35,7 +33,7 @@ def clean() -> None:
 @cli.command()
 def run(
     script: Annotated[
-        Path | None,
+        Optional[Path],  # noqa: FA100  # Typer is sped
         typer.Argument(
             exists=True,
             file_okay=True,
@@ -46,9 +44,7 @@ def run(
         ),
     ] = None,
     python_flags: Annotated[
-        Optional[  # noqa: UP007  # Typer can't handle unions yet
-            List[str]  # noqa: UP006  # and Typer can't list[X]
-        ],
+        Optional[List[str]],  # noqa: FA100
         typer.Option(help="Extra flags to pass to Python"),
     ] = None,
     ignore_version: Annotated[
@@ -60,7 +56,7 @@ def run(
         ),
     ] = False,
     force_version: Annotated[
-        Optional[str],  # noqa: UP007
+        Optional[str],  # noqa: FA100
         typer.Option(
             "--force-version",
             "-f",
