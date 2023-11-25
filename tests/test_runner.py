@@ -120,7 +120,7 @@ class TestForceFlags:
             cli,
             ["run", "--force-version", "69420", "tests/examples/rich_requests.py"],
         )
-        assert result.exit_code == 2
+        assert result.exit_code == 1
         assert "not found" in result.stderr
 
     @pytest.mark.usefixtures("empty_cache")
@@ -142,5 +142,5 @@ class TestForceFlags:
             cli,
             ["run", "-f", "69420", "tests/examples/rich_requests.py"],
         )
-        assert result.exit_code == 2
+        assert result.exit_code == 1
         assert "not found" in result.stderr
