@@ -39,7 +39,7 @@ def empty_cache() -> None:
 def test_main(capfd):
     result = runner.invoke(
         cli,
-        ["run", "tests/examples/rich_requests.py"],
+        ["tests/examples/rich_requests.py"],
     )
     out, _ = capfd.readouterr()
     assert result.exit_code == 0
@@ -52,7 +52,7 @@ def test_main(capfd):
 def test_clean_venvs(capfd):
     result = runner.invoke(
         cli,
-        ["run", "tests/examples/rich_requests.py"],
+        ["tests/examples/rich_requests.py"],
     )
     out, _ = capfd.readouterr()
     assert result.exit_code == 0
@@ -62,7 +62,7 @@ def test_clean_venvs(capfd):
 
     result = runner.invoke(
         cli,
-        ["clean"],
+        ["--clean"],
     )
     assert result.exit_code == 0
     assert not CACHE_DIR.exists()
@@ -72,7 +72,7 @@ def test_clean_venvs(capfd):
 def test_ignore_version(capfd):
     result = runner.invoke(
         cli,
-        ["run", "--ignore-version", "tests/examples/impossible_python.py"],
+        ["--ignore-version", "tests/examples/impossible_python.py"],
     )
     out, _ = capfd.readouterr()
     assert result.exit_code == 0
@@ -86,7 +86,7 @@ def test_caching(capfd):
     start = time.time()
     result = runner.invoke(
         cli,
-        ["run", "tests/examples/rich_requests.py"],
+        ["tests/examples/rich_requests.py"],
     )
     out, _ = capfd.readouterr()
     assert result.exit_code == 0
@@ -95,7 +95,7 @@ def test_caching(capfd):
     start = time.time()
     result = runner.invoke(
         cli,
-        ["run", "tests/examples/rich_requests.py"],
+        ["tests/examples/rich_requests.py"],
     )
     out, _ = capfd.readouterr()
     assert result.exit_code == 0
@@ -107,7 +107,7 @@ def test_caching(capfd):
 def test_impossible_python():
     result = runner.invoke(
         cli,
-        ["run", "tests/examples/impossible_python.py"],
+        ["tests/examples/impossible_python.py"],
     )
     assert result.exit_code == 1
     assert "not found" in result.stderr
@@ -118,7 +118,6 @@ def test_force_version_impossible_python():
     result = runner.invoke(
         cli,
         [
-            "run",
             "tests/examples/rich_requests.py",
             "--force-version",
             "~&%29",
@@ -134,7 +133,6 @@ class TestForceFlags:
         result = runner.invoke(
             cli,
             [
-                "run",
                 "tests/examples/rich_requests.py",
                 "--force-version",
                 "69420",
@@ -148,7 +146,6 @@ class TestForceFlags:
         result = runner.invoke(
             cli,
             [
-                "run",
                 "--force-version",
                 ".".join(map(str, sys.version_info[:2])),
                 "tests/examples/impossible_python.py",
@@ -162,7 +159,7 @@ class TestForceFlags:
     def test_force_short_impossible_python(self):
         result = runner.invoke(
             cli,
-            ["run", "-f", "69420", "tests/examples/rich_requests.py"],
+            ["-f", "69420", "tests/examples/rich_requests.py"],
         )
         assert result.exit_code == 1
         assert "not found" in result.stderr

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import typer
+from click.exceptions import UsageError
 from packaging.requirements import Requirement
 from packaging.version import Version
 from rich.console import Console
@@ -25,26 +26,20 @@ console = Console(stderr=True)
 
 
 @cli.command()
-def clean() -> None:
-    """Clean the virtual environment caches."""
-    clean_venvs()
-
-
-@cli.command()
 def run(
     script: Annotated[
-        Path,
+        Optional[Path],  # noqa: FA100  # Typer can't handle unions
         typer.Argument(
             exists=True,
             file_okay=True,
             dir_okay=False,
             readable=True,
             resolve_path=True,
-            help="The path of the script to run (module only)",
+            help="The path of the script to run (modules only)",
         ),
-    ],
+    ] = None,
     python_flags: Annotated[
-        Optional[List[str]],  # noqa: FA100  # Typer is sped
+        Optional[List[str]],  # noqa: FA100
         typer.Option(help="Extra flags to pass to Python"),
     ] = None,
     ignore_version: Annotated[
@@ -53,6 +48,12 @@ def run(
             "--ignore-version",
             "-i",
             help="Ignore Python version requirements specified in the script",
+        ),
+    ] = False,
+    clean: Annotated[
+        bool,
+        typer.Option(
+            help="Clean the virtual environment caches",
         ),
     ] = False,
     force_version: Annotated[
@@ -64,7 +65,18 @@ def run(
         ),
     ] = None,
 ) -> None:
-    """Automatically install necessary dependencies to run a Python script."""
+    """Automatically install necessary dependencies to run a Python script.
+
+    --clean can be used without 'SCRIPT'
+    """
+    if not clean and script is None:
+        msg = "Missing argument 'SCRIPT'."
+        raise UsageError(msg)
+    if clean:
+        clean_venvs()
+        console.print("[green bold]Cleaned all venvs[/]")
+        if script is None:
+            raise typer.Exit(code=0)
     # Get script dependencies
     pyproject = read(str(script.read_text()))
     script_deps = []
