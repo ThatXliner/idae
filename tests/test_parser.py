@@ -1,6 +1,8 @@
 import pytest
+from packaging.specifiers import InvalidSpecifier
 
 from idae.pep723 import read
+from idae.resolver import get_python
 
 DUPE_PYPROJECT = """
 # /// pyproject
@@ -71,3 +73,8 @@ def test_normal_deps():
     assert read(EXAMPLE) == {
         "run": {"dependencies": ["requests<3", "rich"], "requires-python": ">=3.11"},
     }
+
+
+def test_invalid_specifier():
+    with pytest.raises(InvalidSpecifier):
+        get_python("~^&10")

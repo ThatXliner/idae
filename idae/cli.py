@@ -12,10 +12,10 @@ from packaging.version import Version
 from rich.console import Console
 
 from idae.pep723 import read
-from idae.resolver import get_python
+from idae.resolver import get_python_or_exit
 from idae.venv import Python, clean_venvs, get_venv
 
-if sys.version_info < (3, 9):
+if sys.version_info < (3, 9):  # pragma: no cover
     from typing_extensions import Annotated
 else:
     from typing import Annotated
@@ -75,7 +75,7 @@ def run(
         executable=sys.executable,
     )
     if force_version is not None:
-        python = get_python(force_version, console)
+        python = get_python_or_exit(force_version, console)
     if pyproject is not None and "run" in pyproject:
         script_deps = (
             []
@@ -88,7 +88,7 @@ def run(
             and force_version is None
             and "requires-python" in pyproject["run"]
         ):
-            python = get_python(pyproject["run"]["requires-python"], console)
+            python = get_python_or_exit(pyproject["run"]["requires-python"], console)
 
     venv_path = get_venv(script_deps, python)
 

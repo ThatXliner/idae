@@ -1,3 +1,4 @@
+# pragma: no cover
 """The main CLI entry point."""
 from idae.cli import cli
 

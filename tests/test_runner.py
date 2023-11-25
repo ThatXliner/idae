@@ -113,6 +113,21 @@ def test_impossible_python():
     assert "not found" in result.stderr
 
 
+@pytest.mark.usefixtures("empty_cache")
+def test_force_version_impossible_python():
+    result = runner.invoke(
+        cli,
+        [
+            "run",
+            "tests/examples/rich_requests.py",
+            "--force-version",
+            "~&%29",
+        ],
+    )
+    assert result.exit_code == 1
+    assert "parsed" in result.stderr
+
+
 class TestForceFlags:
     @pytest.mark.usefixtures("empty_cache")
     def test_force_version_impossible_python(self):
