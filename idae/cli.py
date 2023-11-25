@@ -89,7 +89,7 @@ def run(
             and "requires-python" in pyproject["run"]
         ):
             python = get_python(
-                pyproject["run"]["requires-python"], console  # type: ignore[assignment]
+                pyproject["run"]["requires-python"], console,  # type: ignore[assignment]
             )
 
     venv_path = get_venv(script_deps, python)
