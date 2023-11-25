@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import itertools
 import shlex
-
 import subprocess
 import sys
 from pathlib import Path
@@ -81,7 +80,7 @@ def run(
         # I should probably shove this into the `get_python`
         # function to avoid code duplication
         if not python:
-            console.print()
+            console.print(f"[red]error: Python version {force_version} not found[/red]")
             raise typer.Exit(code=1)
     if pyproject is not None and "run" in pyproject:
         script_deps = (

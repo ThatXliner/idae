@@ -1,32 +1,16 @@
 # ruff: noqa: ANN003, ANN002, ANN001, ANN201
 
+import shutil
+import time
+
+import platformdirs
+import pytest
 from typer.testing import CliRunner
 
-from idae.cli import cli, run
-import pytest
-import typer
-from contextlib import redirect_stdout
-import io
-
-
-import pexpect
-from pathlib import Path
+from idae.cli import cli
 
 runner = CliRunner(mix_stderr=False)
 
-EXAMPLE_OUTPUT_WITH_COLOR = """\033[1m[\033[0m
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'1'\033[0m, \033[32m'PEP Purpose and Guidelines'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'2'\033[0m, \033[32m'Procedure for Adding New Modules'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'3'\033[0m, \033[32m'Guidelines for Handling Bug Reports'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'4'\033[0m, \033[32m'Deprecation of Standard Modules'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'5'\033[0m, \033[32m'Guidelines for Language Evolution'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'6'\033[0m, \033[32m'Bug Fix Releases'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'7'\033[0m, \033[32m'Style Guide for C Code'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'8'\033[0m, \033[32m'Style Guide for Python Code'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'9'\033[0m, \033[32m'Sample Plaintext PEP Template'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'10'\033[0m, \033[32m'Voting Guidelines'\033[0m\033[1m)\033[0m
-\033[1m]\033[0m
-"""  # noqa: E501: line-too-long
 EXAMPLE_OUTPUT = """[
 │   ('1', 'PEP Purpose and Guidelines'),
 │   ('2', 'Procedure for Adding New Modules'),
@@ -38,30 +22,55 @@ EXAMPLE_OUTPUT = """[
 │   ('8', 'Style Guide for Python Code'),
 │   ('9', 'Sample Plaintext PEP Template'),
 │   ('10', 'Voting Guidelines')
-]"""
+]
+"""
 
 
-def patched_init(self, *args, **kwargs):
-    kwargs["encoding"] = "utf-8"  # Specify the encoding parameter
-    self._original_init(*args, **kwargs)
+CACHE_DIR = platformdirs.user_cache_path("idae")
 
 
-def test_main(monkeypatch):
-    monkeypatch.setattr(
-        pexpect.spawn,
-        "interact",
-        lambda self, *_, **__: self.expect(EXAMPLE_OUTPUT),
+@pytest.fixture()
+def empty_cache() -> None:
+    if CACHE_DIR.is_dir():
+        shutil.rmtree(CACHE_DIR, ignore_errors=True)
+
+
+@pytest.mark.usefixtures("empty_cache")
+def test_main(capfd):
+    result = runner.invoke(
+        cli,
+        ["run", "tests/examples/rich_requests.py"],
     )
-    original_init = pexpect.spawn.__init__
-    monkeypatch.setattr(pexpect.spawn, "__init__", patched_init)
-    pexpect.spawn._original_init = original_init  # noqa: SLF001
-    f = io.StringIO()
-    with redirect_stdout(f), pytest.raises(typer.Exit) as exc_info:
-            run(Path("tests/examples/rich_requests.py"))
-    assert exc_info.value.args == 0, (exc_info, exc_info.value.code, exc_info.traceback[-1])
-    assert f.getvalue() == EXAMPLE_OUTPUT
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out == EXAMPLE_OUTPUT
 
 
+@pytest.mark.usefixtures("empty_cache")
+def test_caching(capfd):
+    start = time.time()
+    result = runner.invoke(
+        cli,
+        ["run", "tests/examples/rich_requests.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    assert out == EXAMPLE_OUTPUT
+    without_cache = time.time() - start
+    start = time.time()
+    result = runner.invoke(
+        cli,
+        ["run", "tests/examples/rich_requests.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    assert out == EXAMPLE_OUTPUT
+    assert time.time() - start < without_cache
+
+
+@pytest.mark.usefixtures("empty_cache")
 def test_impossible_python():
     result = runner.invoke(
         cli,
