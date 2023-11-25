@@ -137,10 +137,10 @@ class TestForceFlags:
         assert result.exit_code == 1
 
     @pytest.mark.usefixtures("empty_cache")
-    def test_force_impossible_python(self):
+    def test_force_short_impossible_python(self):
         result = runner.invoke(
             cli,
-            ["run", "--force", "69420", "tests/examples/rich_requests.py"],
+            ["run", "-f", "69420", "tests/examples/rich_requests.py"],
         )
         assert result.exit_code == 2
         assert "not found" in result.stderr
