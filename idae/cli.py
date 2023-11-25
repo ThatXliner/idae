@@ -34,17 +34,14 @@ def clean() -> None:
 
 @cli.command()
 def run(
-    script: Annotated[
-        Path,
-        typer.Argument(
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            readable=True,
-            resolve_path=True,
-            help="The path of the script to run (module only)",
-        ),
-    ],
+    script: Path = typer.Argument(
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        resolve_path=True,
+        help="The path of the script to run (module only)",
+    ),
     python_flags: Annotated[
         Optional[  # noqa: UP007  # Typer can't handle unions yet
             List[str]  # noqa: UP006
