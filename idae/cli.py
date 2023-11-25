@@ -25,8 +25,8 @@ cli = typer.Typer()
 console = Console(stderr=True)
 
 
-@cli.command()
-def run(
+@cli.command(context_settings={"ignore_unknown_options": True})
+def run(  # noqa: PLR0913
     script: Annotated[
         Optional[Path],  # noqa: FA100  # Typer can't handle unions
         typer.Argument(
@@ -36,6 +36,12 @@ def run(
             readable=True,
             resolve_path=True,
             help="The path of the script to run (modules only)",
+        ),
+    ] = None,
+    args: Annotated[
+        Optional[List[str]],  # noqa: FA100
+        typer.Argument(
+            help="Arguments to pass to the script",
         ),
     ] = None,
     python_flags: Annotated[
@@ -108,6 +114,11 @@ def run(
             map(shlex.split, python_flags or []),
         ),
     )
+    extra_args = list(
+        itertools.chain.from_iterable(
+            map(shlex.split, args or []),
+        ),
+    )
     # Run the script inside the venv
     raise typer.Exit(
         code=subprocess.run(
@@ -115,6 +126,7 @@ def run(
                 str(venv_path / "bin/python"),
                 *extra_flags,
                 str(script),
+                *extra_args,
             ],
             check=False,
         ).returncode,

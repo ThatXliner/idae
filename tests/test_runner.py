@@ -48,6 +48,30 @@ def test_main(capfd):
     assert out == EXAMPLE_OUTPUT
 
 
+def test_args(capfd):
+    result = runner.invoke(
+        cli,
+        ["tests/examples/echo.py", "hello world"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out == "hello world"
+
+
+def test_exotic_args(capfd):
+    result = runner.invoke(
+        cli,
+        ["tests/examples/echo.py", "hello world -- -h 237"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out == "hello world -- -h 237\n"
+
+
 @pytest.mark.usefixtures("empty_cache")
 def test_clean_venvs(capfd):
     result = runner.invoke(
