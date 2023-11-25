@@ -33,7 +33,7 @@ def clean() -> None:
 @cli.command()
 def run(
     script: Annotated[
-        Optional[Path],  # noqa: FA100  # Typer is sped
+        Path,
         typer.Argument(
             exists=True,
             file_okay=True,
@@ -42,9 +42,9 @@ def run(
             resolve_path=True,
             help="The path of the script to run (module only)",
         ),
-    ] = None,
+    ],
     python_flags: Annotated[
-        Optional[List[str]],  # noqa: FA100
+        Optional[List[str]],  # noqa: FA100  # Typer is sped
         typer.Option(help="Extra flags to pass to Python"),
     ] = None,
     ignore_version: Annotated[
@@ -75,7 +75,7 @@ def run(
         executable=sys.executable,
     )
     if force_version is not None:
-        python = get_python(force_version)
+        python = get_python(force_version)  # type: ignore[assignment]
         # I should probably shove this into the `get_python`
         # function to avoid code duplication
         if not python:
@@ -93,7 +93,9 @@ def run(
             and force_version is None
             and "requires-python" in pyproject["run"]
         ):
-            python = get_python(pyproject["run"]["requires-python"])
+            python = get_python(
+                pyproject["run"]["requires-python"],  # type: ignore[assignment]
+            )
             if not python:
                 console.print(
                     "[red]error: Python version "

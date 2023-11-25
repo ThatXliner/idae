@@ -25,7 +25,7 @@ class Python:
     """Object representing a Python executable."""
 
     version: Version
-    executable: str | PathLike
+    executable: str | PathLike[str]
 
 
 def get_venv(requirements: list[Requirement], python: Python) -> Path:

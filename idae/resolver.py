@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import findpython  # type: ignore[import]
+import findpython  # type: ignore[import-untyped]
 from packaging.specifiers import SpecifierSet
 
 
