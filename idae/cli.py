@@ -6,7 +6,7 @@ import shlex
 import subprocess
 import sys
 from pathlib import Path  # noqa: TCH003  # Likely required for Typer
-from typing import Optional
+from typing import Optional, List
 
 import typer
 from packaging.requirements import Requirement
@@ -46,7 +46,9 @@ def run(
         ),
     ],
     python_flags: Annotated[
-        Optional[list[str]],  # noqa: UP007  # Typer can't handle unions yet
+        Optional[  # noqa: UP007  # Typer can't handle unions yet
+            List[str]  # noqa: UP006
+        ],  # and Typer can't list[X]
         typer.Option(help="Extra flags to pass to Python"),
     ] = None,
     ignore_version: Annotated[
