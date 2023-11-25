@@ -46,14 +46,12 @@ def run(
         List[str]  # noqa: UP006 # and Typer can't list[X]
     ] = typer.Option(help="Extra flags to pass to Python"),
     ignore_version: bool = typer.Option(
-        "--ignore-version",
-        "-i",
+        "-i/--ignore-version",
         default=False,
         help="Ignore Python version requirements specified in the script",
     ),
     force_version: Optional[str] = typer.Option(  # noqa: UP007
-        "--force-version",
-        "-f",
+        "-f/--force-version",
         help="Force idae to use a specific Python version",
     ),
 ) -> None:
