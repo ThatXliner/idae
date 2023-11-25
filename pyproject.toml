@@ -22,7 +22,7 @@ homepage = "https://github.com/ThatXliner/idae"
 # keywords = ["awesome", "project"]  # Maximum of 5 keywords
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 tomli = { version = "^2.0.1", python = "<3.11" }
 platformdirs = ">=4.0.0"
 packaging = ">=23.2"
