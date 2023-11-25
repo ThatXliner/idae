@@ -1,6 +1,6 @@
 # ruff: noqa: ANN003, ANN002, ANN001, ANN201
-
 import shutil
+import sys
 import time
 
 import platformdirs
@@ -49,6 +49,19 @@ def test_main(capfd):
 
 
 @pytest.mark.usefixtures("empty_cache")
+def test_ignore_version(capfd):
+    result = runner.invoke(
+        cli,
+        ["run", "--ignore-version", "tests/examples/impossible_python.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out == EXAMPLE_OUTPUT
+
+
+@pytest.mark.usefixtures("empty_cache")
 def test_caching(capfd):
     start = time.time()
     result = runner.invoke(
@@ -76,6 +89,39 @@ def test_impossible_python():
         cli,
         ["run", "tests/examples/impossible_python.py"],
     )
-    print(result)
     assert result.exit_code == 1
     assert "not found" in result.stderr
+
+
+class TestForceFlags:
+    @pytest.mark.usefixtures("empty_cache")
+    def test_force_version_impossible_python(self):
+        result = runner.invoke(
+            cli,
+            ["run", "--force-version", "69420", "tests/examples/rich_requests.py"],
+        )
+        assert result.exit_code == 1
+        assert "not found" in result.stderr
+
+    @pytest.mark.usefixtures("empty_cache")
+    def test_force_version_python(self):
+        result = runner.invoke(
+            cli,
+            [
+                "run",
+                "--force-version",
+                ".".join(sys.version_info[:2]),
+                "tests/examples/rich_requests.py",
+            ],
+        )
+        assert result.exit_code == 1
+        assert "not found" in result.stderr
+
+    @pytest.mark.usefixtures("empty_cache")
+    def test_force_impossible_python(self):
+        result = runner.invoke(
+            cli,
+            ["run", "--force", "69420", "tests/examples/rich_requests.py"],
+        )
+        assert result.exit_code == 1
+        assert "not found" in result.stderr
