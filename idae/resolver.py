@@ -21,7 +21,7 @@ def get_python(version: str, console: Console) -> findpython.PythonVersion:
     except ValueError:
         pass
     else:
-        version = f"=={version}"
+        version = f"~={version}"
     try:
         target = SpecifierSet(version)
     except InvalidSpecifier as err:

@@ -140,14 +140,8 @@ class TestForceFlags:
             ],
         )
         assert result.exit_code == 0
-        out, err = capfd.readouterr()
-        assert out == EXAMPLE_OUTPUT, (
-            out,
-            err,
-            result.stdout,
-            result.stderr,
-            ".".join(map(str, sys.version_info[:2])),
-        )
+        out, _ = capfd.readouterr()
+        assert out == EXAMPLE_OUTPUT
 
     @pytest.mark.usefixtures("empty_cache")
     def test_force_short_impossible_python(self):
