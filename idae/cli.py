@@ -75,12 +75,7 @@ def run(
         executable=sys.executable,
     )
     if force_version is not None:
-        python = get_python(force_version)  # type: ignore[assignment]
-        # I should probably shove this into the `get_python`
-        # function to avoid code duplication
-        if not python:
-            console.print(f"[red]error: Python version {force_version} not found[/red]")
-            raise typer.Exit(code=1)
+        python = get_python(force_version, console)  # type: ignore[assignment]
     if pyproject is not None and "run" in pyproject:
         script_deps = (
             []
@@ -94,15 +89,8 @@ def run(
             and "requires-python" in pyproject["run"]
         ):
             python = get_python(
-                pyproject["run"]["requires-python"],  # type: ignore[assignment]
+                pyproject["run"]["requires-python"], console  # type: ignore[assignment]
             )
-            if not python:
-                console.print(
-                    "[red]error: Python version "
-                    + pyproject["run"]["requires-python"]
-                    + " not found[/red]",
-                )
-                raise typer.Exit(code=1)
 
     venv_path = get_venv(script_deps, python)
 

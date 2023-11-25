@@ -2,16 +2,33 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import findpython  # type: ignore[import]
-from packaging.specifiers import SpecifierSet
+import typer
+from packaging.specifiers import InvalidSpecifier, SpecifierSet
+
+if TYPE_CHECKING:
+    from rich.console import Console
 
 
-def get_python(version: str) -> findpython.PythonVersion | None:
-    """Resolve the version string."""
+def get_python(version: str, console: Console) -> findpython.PythonVersion:
+    """Resolve the version string or raise Exit."""
     # Order from latest version to earliest
     pythons = {python.version: python for python in findpython.find_all()}
-    target = SpecifierSet(version)
+    try:
+        float(version)
+    except ValueError:
+        pass
+    else:
+        version = f"=={version}"
+    try:
+        target = SpecifierSet(version)
+    except InvalidSpecifier as err:
+        console.print(f"[red]error: Python version {version} could not be parsed[/red]")
+        raise typer.Exit(code=1) from err
     for python_version, python in pythons.items():
         if python_version in target:
             return python
-    return None
+    console.print(f"[red]error: Python version {version} not found[/red]")
+    raise typer.Exit(code=1)

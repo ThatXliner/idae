@@ -118,13 +118,18 @@ class TestForceFlags:
     def test_force_version_impossible_python(self):
         result = runner.invoke(
             cli,
-            ["run", "--force-version", "69420", "tests/examples/rich_requests.py"],
+            [
+                "run",
+                "tests/examples/rich_requests.py",
+                "--force-version",
+                "69420",
+            ],
         )
         assert result.exit_code == 1
         assert "not found" in result.stderr
 
     @pytest.mark.usefixtures("empty_cache")
-    def test_force_version_python(self):
+    def test_force_version_python(self, capfd):
         result = runner.invoke(
             cli,
             [
@@ -134,7 +139,15 @@ class TestForceFlags:
                 "tests/examples/impossible_python.py",
             ],
         )
-        assert result.exit_code == 1
+        assert result.exit_code == 0
+        out, err = capfd.readouterr()
+        assert out == EXAMPLE_OUTPUT, (
+            out,
+            err,
+            result.stdout,
+            result.stderr,
+            ".".join(map(str, sys.version_info[:2])),
+        )
 
     @pytest.mark.usefixtures("empty_cache")
     def test_force_short_impossible_python(self):
