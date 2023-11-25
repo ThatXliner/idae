@@ -5,7 +5,8 @@ import itertools
 import shlex
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path  # noqa: TCH003  # Likely required for Typer
+from typing import List, Optional
 
 import typer
 from packaging.requirements import Requirement
@@ -45,7 +46,7 @@ def run(
         ),
     ],
     python_flags: Annotated[
-        list[str] | None,
+        Optional[List[str]],  # noqa: UP007,UP006  # Typer is old
         typer.Option(help="Extra flags to pass to Python"),
     ] = None,
     ignore_version: Annotated[
@@ -57,7 +58,7 @@ def run(
         ),
     ] = False,
     force_version: Annotated[
-        str | None,
+        Optional[str],  # noqa: UP007
         typer.Option(
             "--force-version",
             "-f",

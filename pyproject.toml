@@ -95,7 +95,7 @@ ignore = [
     "D213",
     "FIX002", # `TODO` comments are fine when linking to issues
 ]
-target-version = "py38"
+target-version = "py37"
 extend-exclude = ["tests/examples/*.py"]
 
 [tool.ruff.per-file-ignores]
