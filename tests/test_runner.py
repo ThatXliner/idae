@@ -104,6 +104,38 @@ def test_caching(capfd):
 
 
 @pytest.mark.usefixtures("empty_cache")
+def test_clean_cache(capfd):
+    # Initial to fill up cache
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    assert out == EXAMPLE_OUTPUT
+
+    start = time.time()
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    assert out == EXAMPLE_OUTPUT
+    with_cache = time.time() - start
+
+    start = time.time()
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py", "--clean"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    assert out == EXAMPLE_OUTPUT
+    assert time.time() - start > with_cache
+
+
+@pytest.mark.usefixtures("empty_cache")
 def test_impossible_python():
     result = runner.invoke(
         cli,
