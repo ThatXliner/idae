@@ -42,28 +42,20 @@ def run(
         resolve_path=True,
         help="The path of the script to run (module only)",
     ),
-    python_flags: Annotated[
-        Optional[  # noqa: UP007  # Typer can't handle unions yet
-            List[str]  # noqa: UP006
-        ],  # and Typer can't list[X]
-        typer.Option(help="Extra flags to pass to Python"),
-    ] = None,
-    ignore_version: Annotated[
-        bool,
-        typer.Option(
-            "--ignore-version",
-            "-i",
-            help="Ignore Python version requirements specified in the script",
-        ),
-    ] = False,
-    force_version: Annotated[
-        Optional[str],  # noqa: UP007
-        typer.Option(
-            "--force-version",
-            "-f",
-            help="Force idae to use a specific Python version",
-        ),
-    ] = None,
+    python_flags: Optional[  # noqa: UP007  # Typer can't handle unions yet
+        List[str]  # noqa: UP006 # and Typer can't list[X]
+    ] = typer.Option(help="Extra flags to pass to Python"),
+    ignore_version: bool = typer.Option(
+        "--ignore-version",
+        "-i",
+        default=False,
+        help="Ignore Python version requirements specified in the script",
+    ),
+    force_version: Optional[str] = typer.Option(  # noqa: UP007
+        "--force-version",
+        "-f",
+        help="Force idae to use a specific Python version",
+    ),
 ) -> None:
     """Automatically install necessary dependencies to run a Python script."""
     # Get script dependencies
