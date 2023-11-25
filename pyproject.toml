@@ -22,7 +22,7 @@ homepage = "https://github.com/ThatXliner/idae"
 # keywords = ["awesome", "project"]  # Maximum of 5 keywords
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 tomli = { version = "^2.0.1", python = "<3.11" }
 platformdirs = ">=4.0.0"
 packaging = ">=23.2"
@@ -35,12 +35,12 @@ idae = "idae.cli:cli"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.1.0"
-hypothesis = "^6.68.2"
-mypy = "^1.0.1"
-pytest = "^7.2.1"
+black = "^23.11.0"
+hypothesis = "^6.90.0"
+mypy = "^1.7.1"
+pytest = "^7.4.3"
 pytest-clarity = "^1.0.1"
-pytest-cov = "^4.0.0"
+pytest-cov = "^4.1.0"
 shed = "^0.10.9"
 
 toml = "^0.10.2"

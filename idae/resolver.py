@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import findpython  # type: ignore[import]
+import findpython  # type: ignore[import-untyped]
 import typer
 from packaging.specifiers import InvalidSpecifier, SpecifierSet
 

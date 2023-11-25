@@ -75,7 +75,7 @@ def run(
         executable=sys.executable,
     )
     if force_version is not None:
-        python = get_python(force_version, console)  # type: ignore[assignment]
+        python = get_python(force_version, console)
     if pyproject is not None and "run" in pyproject:
         script_deps = (
             []
@@ -88,10 +88,7 @@ def run(
             and force_version is None
             and "requires-python" in pyproject["run"]
         ):
-            python = get_python(
-                pyproject["run"]["requires-python"],
-                console,  # type: ignore[assignment]
-            )
+            python = get_python(pyproject["run"]["requires-python"], console)
 
     venv_path = get_venv(script_deps, python)
 
