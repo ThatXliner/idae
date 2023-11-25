@@ -71,7 +71,6 @@ def run(
     """
     if clean:
         clean_venvs()
-        console.print("[green bold]Cleaned all venvs[/]")
     if script is None:
         if clean:
             raise typer.Exit(code=0)
