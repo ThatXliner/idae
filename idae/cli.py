@@ -119,5 +119,6 @@ def run(
                 *extra_flags,
                 str(script),
             ],
+            check=False,
         ).returncode,
     )

@@ -5,6 +5,9 @@ from typer.testing import CliRunner
 from idae.cli import cli, run
 import pytest
 import typer
+from contextlib import redirect_stdout
+import io
+
 
 import pexpect
 from pathlib import Path
@@ -52,9 +55,11 @@ def test_main(monkeypatch):
     original_init = pexpect.spawn.__init__
     monkeypatch.setattr(pexpect.spawn, "__init__", patched_init)
     pexpect.spawn._original_init = original_init  # noqa: SLF001
-    with pytest.raises(typer.Exit) as exc_info:
-        run(Path("tests/examples/rich_requests.py"))
-    assert exc_info.value.args == 0, exc_info
+    f = io.StringIO()
+    with redirect_stdout(f), pytest.raises(typer.Exit) as exc_info:
+            run(Path("tests/examples/rich_requests.py"))
+    assert exc_info.value.args == 0, (exc_info, exc_info.value.code, exc_info.traceback[-1])
+    assert f.getvalue() == EXAMPLE_OUTPUT
 
 
 def test_impossible_python():
