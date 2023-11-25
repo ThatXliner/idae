@@ -1,12 +1,12 @@
 """CLI interface."""
-# from __future__ import annotations
+from __future__ import annotations
 
 import itertools
 import shlex
 import subprocess
 import sys
 from pathlib import Path  # noqa: TCH003  # Likely required for Typer
-from typing import Optional, List
+from typing import List, Optional
 
 import typer
 from packaging.requirements import Requirement
@@ -35,7 +35,7 @@ def clean() -> None:
 @cli.command()
 def run(
     script: Annotated[
-        Path,
+        Path | None,
         typer.Argument(
             exists=True,
             file_okay=True,
