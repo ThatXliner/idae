@@ -49,6 +49,26 @@ def test_main(capfd):
 
 
 @pytest.mark.usefixtures("empty_cache")
+def test_clean_venvs(capfd):
+    result = runner.invoke(
+        cli,
+        ["run", "tests/examples/rich_requests.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out == EXAMPLE_OUTPUT
+
+    result = runner.invoke(
+        cli,
+        ["run", "clean"],
+    )
+    assert result.exit_code == 0
+    assert not CACHE_DIR.exists()
+
+
+@pytest.mark.usefixtures("empty_cache")
 def test_ignore_version(capfd):
     result = runner.invoke(
         cli,
