@@ -69,10 +69,11 @@ def run(
 
     --clean can be used without 'SCRIPT'
     """
+    if clean:
+        clean_venvs()
+        console.print("[green bold]Cleaned all venvs[/]")
     if script is None:
         if clean:
-            clean_venvs()
-            console.print("[green bold]Cleaned all venvs[/]")
             raise typer.Exit(code=0)
         msg = "Missing argument 'SCRIPT'."
         raise UsageError(msg)
