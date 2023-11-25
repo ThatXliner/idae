@@ -1,5 +1,5 @@
 """CLI interface."""
-from __future__ import annotations
+# from __future__ import annotations
 
 import itertools
 import shlex
@@ -34,26 +34,39 @@ def clean() -> None:
 
 @cli.command()
 def run(
-    script: Path = typer.Argument(
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        readable=True,
-        resolve_path=True,
-        help="The path of the script to run (module only)",
-    ),
-    python_flags: Optional[  # noqa: UP007  # Typer can't handle unions yet
-        List[str]  # noqa: UP006 # and Typer can't list[X]
-    ] = typer.Option(help="Extra flags to pass to Python"),
-    ignore_version: bool = typer.Option(
-        "-i/--ignore-version",
-        default=False,
-        help="Ignore Python version requirements specified in the script",
-    ),
-    force_version: Optional[str] = typer.Option(  # noqa: UP007
-        "-f/--force-version",
-        help="Force idae to use a specific Python version",
-    ),
+    script: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="The path of the script to run (module only)",
+        ),
+    ] = None,
+    python_flags: Annotated[
+        Optional[  # noqa: UP007  # Typer can't handle unions yet
+            List[str]  # noqa: UP006  # and Typer can't list[X]
+        ],
+        typer.Option(help="Extra flags to pass to Python"),
+    ] = None,
+    ignore_version: Annotated[
+        bool,
+        typer.Option(
+            "--ignore-version",
+            "-i",
+            help="Ignore Python version requirements specified in the script",
+        ),
+    ] = False,
+    force_version: Annotated[
+        Optional[str],  # noqa: UP007
+        typer.Option(
+            "--force-version",
+            "-f",
+            help="Force idae to use a specific Python version",
+        ),
+    ] = None,
 ) -> None:
     """Automatically install necessary dependencies to run a Python script."""
     # Get script dependencies
