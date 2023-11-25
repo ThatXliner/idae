@@ -130,7 +130,7 @@ class TestForceFlags:
             [
                 "run",
                 "--force-version",
-                ".".join(sys.version_info[:2]),
+                ".".join(map(str, sys.version_info[:2])),
                 "tests/examples/rich_requests.py",
             ],
         )
