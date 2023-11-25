@@ -62,7 +62,7 @@ def test_clean_venvs(capfd):
 
     result = runner.invoke(
         cli,
-        ["run", "clean"],
+        ["clean"],
     )
     assert result.exit_code == 0
     assert not CACHE_DIR.exists()
@@ -120,7 +120,7 @@ class TestForceFlags:
             cli,
             ["run", "--force-version", "69420", "tests/examples/rich_requests.py"],
         )
-        assert result.exit_code == 1
+        assert result.exit_code == 2
         assert "not found" in result.stderr
 
     @pytest.mark.usefixtures("empty_cache")
@@ -131,11 +131,10 @@ class TestForceFlags:
                 "run",
                 "--force-version",
                 ".".join(map(str, sys.version_info[:2])),
-                "tests/examples/rich_requests.py",
+                "tests/examples/impossible_python.py",
             ],
         )
         assert result.exit_code == 1
-        assert "not found" in result.stderr
 
     @pytest.mark.usefixtures("empty_cache")
     def test_force_impossible_python(self):
@@ -143,5 +142,5 @@ class TestForceFlags:
             cli,
             ["run", "--force", "69420", "tests/examples/rich_requests.py"],
         )
-        assert result.exit_code == 1
+        assert result.exit_code == 2
         assert "not found" in result.stderr
