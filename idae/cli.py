@@ -69,14 +69,13 @@ def run(
 
     --clean can be used without 'SCRIPT'
     """
-    if not clean and script is None:
+    if script is None:
+        if clean:
+            clean_venvs()
+            console.print("[green bold]Cleaned all venvs[/]")
+            raise typer.Exit(code=0)
         msg = "Missing argument 'SCRIPT'."
         raise UsageError(msg)
-    if clean:
-        clean_venvs()
-        console.print("[green bold]Cleaned all venvs[/]")
-        if script is None:
-            raise typer.Exit(code=0)
     # Get script dependencies
     pyproject = read(str(script.read_text()))
     script_deps = []
