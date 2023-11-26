@@ -11,12 +11,9 @@ classifiers = [
     # Get the list of trove classifiers here: https://pypi.org/classifiers/
     "Programming Language :: Python :: Implementation :: CPython",
     "Typing :: Typed",
-    "Operating System :: MacOS",
-    "Operating System :: POSIX",
-    "Operating System :: Unix",
+    "Operating System :: OS Independent",
     "Development Status :: 4 - Beta",
     "Natural Language :: English",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
 ]
 homepage = "https://github.com/ThatXliner/idae"
 # keywords = ["awesome", "project"]  # Maximum of 5 keywords
