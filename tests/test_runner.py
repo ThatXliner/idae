@@ -1,4 +1,5 @@
 # ruff: noqa: ANN003, ANN002, ANN001, ANN201
+import platform
 import shutil
 import sys
 import time
@@ -24,7 +25,21 @@ EXAMPLE_OUTPUT = """[
 │   ('10', 'Voting Guidelines')
 ]
 """
-
+EXAMPLE_OUTPUT_ASCII = """[
+   ('1', 'PEP Purpose and Guidelines'),
+   ('2', 'Procedure for Adding New Modules'),
+   ('3', 'Guidelines for Handling Bug Reports'),
+   ('4', 'Deprecation of Standard Modules'),
+   ('5', 'Guidelines for Language Evolution'),
+   ('6', 'Bug Fix Releases'),
+   ('7', 'Style Guide for C Code'),
+   ('8', 'Style Guide for Python Code'),
+   ('9', 'Sample Plaintext PEP Template'),
+   ('10', 'Voting Guidelines')
+]
+"""
+if platform.system() == "Windows":
+    EXAMPLE_OUTPUT = EXAMPLE_OUTPUT_ASCII
 
 CACHE_DIR = platformdirs.user_cache_path("idae")
 
