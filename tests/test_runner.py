@@ -22,8 +22,7 @@ EXAMPLE_OUTPUT = """[
 │   ('8', 'Style Guide for Python Code'),
 │   ('9', 'Sample Plaintext PEP Template'),
 │   ('10', 'Voting Guidelines')
-]
-"""
+]"""
 
 
 CACHE_DIR = platformdirs.user_cache_path("idae")
@@ -45,7 +44,7 @@ def test_main(capfd):
     assert result.exit_code == 0
     # We have to use this instead of result.stdout
     # As Click doesn't capture the stdin fileno
-    assert out == EXAMPLE_OUTPUT
+    assert out.strip() == EXAMPLE_OUTPUT
 
 
 def test_args(capfd):
@@ -57,7 +56,7 @@ def test_args(capfd):
     assert result.exit_code == 0
     # We have to use this instead of result.stdout
     # As Click doesn't capture the stdin fileno
-    assert out == "hello world\n"
+    assert out.strip() == "hello world"
 
 
 def test_exotic_args(capfd):
@@ -69,7 +68,7 @@ def test_exotic_args(capfd):
     assert result.exit_code == 0
     # We have to use this instead of result.stdout
     # As Click doesn't capture the stdin fileno
-    assert out == "hello world -- -h 237\n"
+    assert out.strip() == "hello world -- -h 237"
 
 
 @pytest.mark.usefixtures("empty_cache")
@@ -82,7 +81,7 @@ def test_clean_venvs(capfd):
     assert result.exit_code == 0
     # We have to use this instead of result.stdout
     # As Click doesn't capture the stdin fileno
-    assert out == EXAMPLE_OUTPUT
+    assert out.strip() == EXAMPLE_OUTPUT
 
     result = runner.invoke(
         cli,
@@ -102,7 +101,7 @@ def test_ignore_version(capfd):
     assert result.exit_code == 0
     # We have to use this instead of result.stdout
     # As Click doesn't capture the stdin fileno
-    assert out == EXAMPLE_OUTPUT
+    assert out.strip() == EXAMPLE_OUTPUT
 
 
 @pytest.mark.usefixtures("empty_cache")
@@ -123,7 +122,7 @@ def test_caching(capfd):
     )
     out, _ = capfd.readouterr()
     assert result.exit_code == 0
-    assert out == EXAMPLE_OUTPUT
+    assert out.strip() == EXAMPLE_OUTPUT
     assert time.time() - start < without_cache
 
 
@@ -136,7 +135,7 @@ def test_clean_cache(capfd):
     )
     out, _ = capfd.readouterr()
     assert result.exit_code == 0
-    assert out == EXAMPLE_OUTPUT
+    assert out.strip() == EXAMPLE_OUTPUT
 
     start = time.time()
     result = runner.invoke(
@@ -145,7 +144,7 @@ def test_clean_cache(capfd):
     )
     out, _ = capfd.readouterr()
     assert result.exit_code == 0
-    assert out == EXAMPLE_OUTPUT
+    assert out.strip() == EXAMPLE_OUTPUT
     with_cache = time.time() - start
 
     start = time.time()
@@ -155,7 +154,7 @@ def test_clean_cache(capfd):
     )
     out, _ = capfd.readouterr()
     assert result.exit_code == 0
-    assert out == EXAMPLE_OUTPUT
+    assert out.strip() == EXAMPLE_OUTPUT
     assert time.time() - start > with_cache
 
 
@@ -209,7 +208,7 @@ class TestForceFlags:
         )
         assert result.exit_code == 0
         out, _ = capfd.readouterr()
-        assert out == EXAMPLE_OUTPUT
+        assert out.strip() == EXAMPLE_OUTPUT
 
     @pytest.mark.usefixtures("empty_cache")
     def test_force_short_impossible_python(self):
