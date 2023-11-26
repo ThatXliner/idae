@@ -2,7 +2,7 @@
 name = "idae"
 description = "A PEP 772 implementation"
 authors = ["Bryan Hu <thatxliner@gmail.com>"]
-version = "0.2.0"
+version = "1.0.0"
 
 readme = "README.md"
 license = "GPL-3.0-or-later"
@@ -12,11 +12,11 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Typing :: Typed",
     "Operating System :: OS Independent",
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Natural Language :: English",
 ]
 homepage = "https://github.com/ThatXliner/idae"
-# keywords = ["awesome", "project"]  # Maximum of 5 keywords
+keywords = ["script", "cli", "python", "typer"] # Maximum of 5 keywords
 
 [tool.poetry.dependencies]
 python = "^3.8"
