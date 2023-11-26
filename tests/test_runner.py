@@ -57,7 +57,7 @@ def test_args(capfd):
     assert result.exit_code == 0
     # We have to use this instead of result.stdout
     # As Click doesn't capture the stdin fileno
-    assert out.replace("\r", "") == "hello world"
+    assert out.replace("\r", "") == "hello world\n"
 
 
 def test_exotic_args(capfd):
@@ -69,7 +69,7 @@ def test_exotic_args(capfd):
     assert result.exit_code == 0
     # We have to use this instead of result.stdout
     # As Click doesn't capture the stdin fileno
-    assert out.replace("\r", "") == "hello world -- -h 237"
+    assert out.replace("\r", "") == "hello world -- -h 237\n"
 
 
 @pytest.mark.usefixtures("empty_cache")
