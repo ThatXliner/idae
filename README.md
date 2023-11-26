@@ -45,11 +45,23 @@ data = resp.json()
 pprint([(k, v["title"]) for k, v in data.items()][:10])
 ```
 
+If you need to pass arguments that look like options for `idae` to the script you want to run, use the standard UNIX convention of `--`. For example, let's say you have a script
+
+```python
+# script.py
+import sys
+print(" ".join(sys.argv[1:]))
+```
+
+and you want that script to output `I am --help`. To run it with Idae, use
+
+```
+idae script.py -- I am --help
+```
+
 ## Caveats
 
-- [Does not support Windows](https://pexpect.readthedocs.io/en/stable/overview.html#pexpect-on-windows)
-- Fails silently if the dependencies could not be found
-- [Crappy interface](https://github.com/ThatXliner/idae/issues/1)
+- [No logging, or very minimal output reporting](https://github.com/ThatXliner/idae/issues/10)
 
 ## How it works
 

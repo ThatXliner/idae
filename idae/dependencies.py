@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from packaging.requirements import Requirement
 
 
@@ -30,14 +30,6 @@ def _get_normalized_dependency(requirement: Requirement) -> str:
     # All TOML writers use double quotes,
     # so allow direct writing or copy/pasting to avoid escaping
     return str(requirement).replace('"', "'")
-
-
-def get_normalized_dependencies(requirements: list[Requirement]) -> list[str]:
-    """Get normalized dependencies."""
-    normalized_dependencies = {
-        _get_normalized_dependency(requirement) for requirement in requirements
-    }
-    return sorted(normalized_dependencies)
 
 
 def hash_dependencies(requirements: list[Requirement]) -> str:

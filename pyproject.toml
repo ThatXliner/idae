@@ -11,36 +11,33 @@ classifiers = [
     # Get the list of trove classifiers here: https://pypi.org/classifiers/
     "Programming Language :: Python :: Implementation :: CPython",
     "Typing :: Typed",
-    "Operating System :: MacOS",
-    "Operating System :: POSIX",
-    "Operating System :: Unix",
+    "Operating System :: OS Independent",
     "Development Status :: 4 - Beta",
     "Natural Language :: English",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
 ]
 homepage = "https://github.com/ThatXliner/idae"
 # keywords = ["awesome", "project"]  # Maximum of 5 keywords
 
 [tool.poetry.dependencies]
-python = "^3.7"
-pexpect = "^4.8.0"
+python = "^3.8"
 tomli = { version = "^2.0.1", python = "<3.11" }
 platformdirs = ">=4.0.0"
 packaging = ">=23.2"
 findpython = "^0.4.0"
-resolvelib = "^1.0.1"
+typer = { extras = ["all"], version = "^0.9.0" }
+typing-extensions = { version = "^4.8.0", python = "<3.9" }
 
 [tool.poetry.scripts]
-idae = "idae.__main__:main"
+idae = "idae.cli:cli"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.1.0"
-hypothesis = "^6.68.2"
-mypy = "^1.0.1"
-pytest = "^7.2.1"
-pytest-clarity = "^1.0.1"
-pytest-cov = "^4.0.0"
+black = "^23.11.0"
+hypothesis = "^6.90.0"
+mypy = "^1.7.1"
+pytest = "^7.4.3"
+pytest-clarity = { version = "^1.0.1", markers = "platform_system != 'Windows'" }
+pytest-cov = "^4.1.0"
 shed = "^0.10.9"
 
 toml = "^0.10.2"
@@ -94,7 +91,7 @@ ignore = [
     # Fix doc rule conflicts
     "D203",
     "D213",
-    "FIX002",  # `TODO` comments are fine when linking to issues
+    "FIX002", # `TODO` comments are fine when linking to issues
 ]
 target-version = "py38"
 extend-exclude = ["tests/examples/*.py"]

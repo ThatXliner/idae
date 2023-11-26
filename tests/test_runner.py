@@ -1,24 +1,17 @@
 # ruff: noqa: ANN003, ANN002, ANN001, ANN201
+import platform
+import shutil
 import sys
+import time
 
-import pexpect
+import platformdirs
 import pytest
+from typer.testing import CliRunner
 
-from idae.__main__ import main
+from idae.cli import cli
 
-EXAMPLE_OUTPUT_WITH_COLOR = """\033[1m[\033[0m
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'1'\033[0m, \033[32m'PEP Purpose and Guidelines'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'2'\033[0m, \033[32m'Procedure for Adding New Modules'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'3'\033[0m, \033[32m'Guidelines for Handling Bug Reports'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'4'\033[0m, \033[32m'Deprecation of Standard Modules'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'5'\033[0m, \033[32m'Guidelines for Language Evolution'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'6'\033[0m, \033[32m'Bug Fix Releases'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'7'\033[0m, \033[32m'Style Guide for C Code'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'8'\033[0m, \033[32m'Style Guide for Python Code'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'9'\033[0m, \033[32m'Sample Plaintext PEP Template'\033[0m\033[1m)\033[0m,
-\033[2;32m│   \033[0m\033[1m(\033[0m\033[32m'10'\033[0m, \033[32m'Voting Guidelines'\033[0m\033[1m)\033[0m
-\033[1m]\033[0m
-"""  # noqa: E501: line-too-long
+runner = CliRunner(mix_stderr=False)
+
 EXAMPLE_OUTPUT = """[
 │   ('1', 'PEP Purpose and Guidelines'),
 │   ('2', 'Procedure for Adding New Modules'),
@@ -30,44 +23,214 @@ EXAMPLE_OUTPUT = """[
 │   ('8', 'Style Guide for Python Code'),
 │   ('9', 'Sample Plaintext PEP Template'),
 │   ('10', 'Voting Guidelines')
-]"""
+]
+"""
+EXAMPLE_OUTPUT_ASCII = """[
+    ('1', 'PEP Purpose and Guidelines'),
+    ('2', 'Procedure for Adding New Modules'),
+    ('3', 'Guidelines for Handling Bug Reports'),
+    ('4', 'Deprecation of Standard Modules'),
+    ('5', 'Guidelines for Language Evolution'),
+    ('6', 'Bug Fix Releases'),
+    ('7', 'Style Guide for C Code'),
+    ('8', 'Style Guide for Python Code'),
+    ('9', 'Sample Plaintext PEP Template'),
+    ('10', 'Voting Guidelines')
+]
+"""
+if platform.system() == "Windows":
+    EXAMPLE_OUTPUT = EXAMPLE_OUTPUT_ASCII
+
+CACHE_DIR = platformdirs.user_cache_path("idae")
 
 
-def patched_init(self, *args, **kwargs):
-    kwargs["encoding"] = "utf-8"  # Specify the encoding parameter
-    self._original_init(*args, **kwargs)
+@pytest.fixture()
+def empty_cache() -> None:
+    if CACHE_DIR.is_dir():
+        shutil.rmtree(CACHE_DIR, ignore_errors=True)
 
 
-def test_main(monkeypatch):
-    monkeypatch.setattr(
-        sys,
-        "argv",
-        ["idae", "tests/examples/rich_requests.py"],
+@pytest.mark.usefixtures("empty_cache")
+def test_main(capfd):
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py"],
     )
-    monkeypatch.setattr(
-        pexpect.spawn,
-        "interact",
-        lambda self, *_, **__: self.expect(EXAMPLE_OUTPUT),
-    )
-    original_init = pexpect.spawn.__init__
-    monkeypatch.setattr(pexpect.spawn, "__init__", patched_init)
-    pexpect.spawn._original_init = original_init  # noqa: SLF001
-    main()
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out.replace("\r", "") == EXAMPLE_OUTPUT
 
 
-def test_impossible_python(monkeypatch):
-    monkeypatch.setattr(
-        sys,
-        "argv",
-        ["idae", "tests/examples/impossible_python.py"],
+def test_args(capfd):
+    result = runner.invoke(
+        cli,
+        ["tests/examples/echo.py", "hello world"],
     )
-    monkeypatch.setattr(
-        pexpect.spawn,
-        "interact",
-        lambda self, *_, **__: self.expect(EXAMPLE_OUTPUT),
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out.replace("\r", "") == "hello world\n"
+
+
+def test_exotic_args(capfd):
+    result = runner.invoke(
+        cli,
+        ["tests/examples/echo.py", "hello world -- -h 237"],
     )
-    original_init = pexpect.spawn.__init__
-    monkeypatch.setattr(pexpect.spawn, "__init__", patched_init)
-    pexpect.spawn._original_init = original_init  # noqa: SLF001
-    with pytest.raises(RuntimeError):
-        main()
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out.replace("\r", "") == "hello world -- -h 237\n"
+
+
+@pytest.mark.usefixtures("empty_cache")
+def test_clean_venvs(capfd):
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out.replace("\r", "") == EXAMPLE_OUTPUT
+
+    result = runner.invoke(
+        cli,
+        ["--clean"],
+    )
+    assert result.exit_code == 0
+    assert not CACHE_DIR.exists()
+
+
+@pytest.mark.usefixtures("empty_cache")
+def test_ignore_version(capfd):
+    result = runner.invoke(
+        cli,
+        ["--ignore-version", "tests/examples/impossible_python.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out.replace("\r", "") == EXAMPLE_OUTPUT
+
+
+@pytest.mark.usefixtures("empty_cache")
+def test_caching(capfd):
+    start = time.time()
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    assert out.replace("\r", "") == EXAMPLE_OUTPUT
+    without_cache = time.time() - start
+    start = time.time()
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    assert out.replace("\r", "") == EXAMPLE_OUTPUT
+    assert time.time() - start < without_cache
+
+
+@pytest.mark.usefixtures("empty_cache")
+def test_clean_cache(capfd):
+    # Initial to fill up cache
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    assert out.replace("\r", "") == EXAMPLE_OUTPUT
+
+    start = time.time()
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    assert out.replace("\r", "") == EXAMPLE_OUTPUT
+    with_cache = time.time() - start
+
+    start = time.time()
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py", "--clean"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    assert out.replace("\r", "") == EXAMPLE_OUTPUT
+    assert time.time() - start > with_cache
+
+
+@pytest.mark.usefixtures("empty_cache")
+def test_impossible_python():
+    result = runner.invoke(
+        cli,
+        ["tests/examples/impossible_python.py"],
+    )
+    assert result.exit_code == 1
+    assert "not found" in result.stderr
+
+
+@pytest.mark.usefixtures("empty_cache")
+def test_force_version_impossible_python():
+    result = runner.invoke(
+        cli,
+        [
+            "tests/examples/rich_requests.py",
+            "--force-version",
+            "~&%29",
+        ],
+    )
+    assert result.exit_code == 1
+    assert "parsed" in result.stderr
+
+
+class TestForceFlags:
+    @pytest.mark.usefixtures("empty_cache")
+    def test_force_version_impossible_python(self):
+        result = runner.invoke(
+            cli,
+            [
+                "tests/examples/rich_requests.py",
+                "--force-version",
+                "69420",
+            ],
+        )
+        assert result.exit_code == 1
+        assert "not found" in result.stderr
+
+    @pytest.mark.usefixtures("empty_cache")
+    def test_force_version_python(self, capfd):
+        result = runner.invoke(
+            cli,
+            [
+                "--force-version",
+                ".".join(map(str, sys.version_info[:2])),
+                "tests/examples/impossible_python.py",
+            ],
+        )
+        assert result.exit_code == 0
+        out, _ = capfd.readouterr()
+        assert out.replace("\r", "") == EXAMPLE_OUTPUT
+
+    @pytest.mark.usefixtures("empty_cache")
+    def test_force_short_impossible_python(self):
+        result = runner.invoke(
+            cli,
+            ["-f", "69420", "tests/examples/rich_requests.py"],
+        )
+        assert result.exit_code == 1
+        assert "not found" in result.stderr
