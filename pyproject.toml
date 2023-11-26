@@ -39,7 +39,7 @@ black = "^23.11.0"
 hypothesis = "^6.90.0"
 mypy = "^1.7.1"
 pytest = "^7.4.3"
-pytest-clarity = "^1.0.1"
+pytest-clarity = { version = "^1.0.1", markers = "platform_system != 'Windows'" }
 pytest-cov = "^4.1.0"
 shed = "^0.10.9"
 
