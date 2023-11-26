@@ -1,6 +1,7 @@
 """Utils for venv creation."""
 from __future__ import annotations
 
+import platform
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -45,7 +46,11 @@ def get_venv(requirements: list[Requirement], python: Python) -> Path:
     if requirements:
         subprocess.run(
             [  # noqa: S603
-                (venv_path / "bin/pip").resolve(),
+                (
+                    venv_path
+                    / ("Scripts" if platform.system() == "Windows" else "bin")
+                    / "pip"
+                ).resolve(),
                 "install",
                 *map(str, requirements),
             ],

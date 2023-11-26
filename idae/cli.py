@@ -1,5 +1,6 @@
 """CLI interface."""
 import itertools
+import platform
 import shlex
 import subprocess
 import sys
@@ -123,7 +124,11 @@ def run(  # noqa: PLR0913
     raise typer.Exit(
         code=subprocess.run(
             [  # noqa: S603  # idae is inherently "insecure"
-                str(venv_path / "bin/python"),
+                str(
+                    venv_path
+                    / ("Scripts" if platform.system() == "Windows" else "bin")
+                    / "python",
+                ),
                 *extra_flags,
                 str(script),
                 *extra_args,
