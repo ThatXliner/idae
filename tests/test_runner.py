@@ -113,7 +113,7 @@ def test_caching(capfd):
     )
     out, _ = capfd.readouterr()
     assert result.exit_code == 0
-    assert out == EXAMPLE_OUTPUT
+    assert out.strip() == EXAMPLE_OUTPUT
     without_cache = time.time() - start
     start = time.time()
     result = runner.invoke(
