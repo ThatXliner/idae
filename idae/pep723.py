@@ -15,7 +15,7 @@ except ModuleNotFoundError:
 REGEX = r"(?m)^# /// (?P<type>[a-zA-Z0-9-]+)$\s(?P<content>(^#(| .*)$\s)+)^# ///$"
 
 
-def read(script: str) -> dict | None:
+def read(script: str) -> dict[str, str] | None:
     """Read a PEP 723 chunk from the given file contents."""
     name = "script"
     matches = list(
