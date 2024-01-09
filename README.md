@@ -28,8 +28,7 @@ The dependency specification within the Python script must be like the following
 
 ```python
 #!/usr/bin/env idae
-# /// pyproject
-# [run]
+# /// script
 # requires-python = ">=3.11"
 # dependencies = [
 #   "requests<3",
@@ -96,8 +95,6 @@ $ pipx install idae
 The scientific name for Pythons is "Pythonidae". I just removed the "Python" and we get "idae".
 
 ## License
-
-Copyright © 2021, Bryan Hu
 
 This project is licensed under the [GNU GPL v3+](https://github.com/ThatXliner/idae/blob/main/LICENSE.txt).
 

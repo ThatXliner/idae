@@ -5,8 +5,7 @@ from idae.pep723 import read
 from idae.resolver import get_python
 
 DUPE_PYPROJECT = """
-# /// pyproject
-# [run]
+# /// script
 # requires-python = ">=3.11"
 # dependencies = [
 #   "requests<3",
@@ -15,8 +14,7 @@ DUPE_PYPROJECT = """
 # ///
 
 
-# /// pyproject
-# [run]
+# /// script
 # requires-python = "69420"
 # dependencies = [
 #   "requests<3",
@@ -41,8 +39,7 @@ data = resp.json()
 pprint([(k, v["title"]) for k, v in data.items()][:10])
 """
 EXAMPLE = """
-# /// pyproject
-# [run]
+# /// script
 # requires-python = ">=3.11"
 # dependencies = [
 #   "requests<3",
@@ -71,7 +68,8 @@ def test_no_deps():
 
 def test_normal_deps():
     assert read(EXAMPLE) == {
-        "run": {"dependencies": ["requests<3", "rich"], "requires-python": ">=3.11"},
+        "dependencies": ["requests<3", "rich"],
+        "requires-python": ">=3.11",
     }
 
 

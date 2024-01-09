@@ -94,19 +94,19 @@ def run(  # noqa: PLR0913
     )
     if force_version is not None:
         python = get_python_or_exit(force_version, console)
-    if pyproject is not None and "run" in pyproject:
+    if pyproject is not None:
         script_deps = (
             []
-            if "dependencies" not in pyproject["run"]
-            else list(map(Requirement, pyproject["run"]["dependencies"]))
+            if "dependencies" not in pyproject
+            else list(map(Requirement, pyproject["dependencies"]))
         )
 
         if (
             not ignore_version
             and force_version is None
-            and "requires-python" in pyproject["run"]
+            and "requires-python" in pyproject
         ):
-            python = get_python_or_exit(pyproject["run"]["requires-python"], console)
+            python = get_python_or_exit(pyproject["requires-python"], console)
 
     venv_path = get_venv(script_deps, python)
 

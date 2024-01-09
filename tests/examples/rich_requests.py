@@ -1,6 +1,5 @@
 #!/usr/bin/env idae
-# /// pyproject
-# [run]
+# /// script
 # dependencies = [
 #   "requests<3",
 #   "rich",
