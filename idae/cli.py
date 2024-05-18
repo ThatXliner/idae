@@ -16,7 +16,7 @@ from rich.console import Console
 
 from idae.pep723 import read
 from idae.resolver import get_python_or_exit
-from idae.venv import Python, clean_venvs, get_venv
+from idae.venv import Python, clean_venvs, get_venv, IDAE_VENV_DIR_NAME
 
 if sys.version_info < (3, 9):  # pragma: no cover
     from typing_extensions import Annotated
@@ -72,18 +72,15 @@ def run(  # noqa: PLR0913
             help="Force idae to use a specific Python version",
         ),
     ] = None,
-    in_dir: Annotated[
-        Optional[str],  # noqa: FA100
+    in_cwd: Annotated[
+        bool,
         typer.Option(
-            "--in-dir",
             "--in-cwd",
             "-c",
-            help="Create the venv in the specified directory if this flag is specified "
-            "[default: the system cache directory if not specified "
-            "and the current working directory if no argument is provided]",
-            show_default=False,
+            help=f"Create the venv in a {IDAE_VENV_DIR_NAME} in the current "
+            "working directory",
         ),
-    ] = None,
+    ] = False,
 ) -> None:
     """Automatically install necessary dependencies to run a Python script.
 
@@ -121,7 +118,7 @@ def run(  # noqa: PLR0913
         ):
             python = get_python_or_exit(pyproject["requires-python"], console)
 
-    venv_path = get_venv(script_deps, python, in_dir)
+    venv_path = get_venv(script_deps, python, Path.cwd() if in_cwd else None)
 
     extra_flags = list(
         itertools.chain.from_iterable(

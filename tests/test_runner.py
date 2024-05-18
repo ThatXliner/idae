@@ -49,6 +49,8 @@ CACHE_DIR = platformdirs.user_cache_path("idae")
 def empty_cache() -> None:
     if CACHE_DIR.is_dir():
         shutil.rmtree(CACHE_DIR, ignore_errors=True)
+    if Path(".idae").is_dir():
+        shutil.rmtree(Path(".idae"), ignore_errors=True)
 
 
 @pytest.mark.usefixtures("empty_cache")
@@ -108,12 +110,13 @@ def test_clean_venvs(capfd):
     assert not CACHE_DIR.exists()
 
 
+@pytest.mark.usefixtures("empty_cache")
 def test_use_current_dir(capfd):
     old_files = set(Path().iterdir())
 
     result = runner.invoke(
         cli,
-        ["tests/examples/rich_requests.py", "--use-cwd"],
+        ["tests/examples/rich_requests.py", "--in-cwd"],
     )
     out, _ = capfd.readouterr()
     assert result.exit_code == 0
@@ -122,8 +125,7 @@ def test_use_current_dir(capfd):
     assert out.replace("\r", "") == EXAMPLE_OUTPUT
 
     new_files = set(Path().iterdir())
-    assert len(new_files - old_files) == 1
-    shutil.rmtree((new_files - old_files).pop())
+    assert Path(".idae") in new_files - old_files
 
 
 @pytest.mark.usefixtures("empty_cache")

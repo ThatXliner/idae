@@ -34,7 +34,7 @@ class Python:
 def get_venv(
     requirements: list[Requirement],
     python: Python,
-    in_dir: str | None = None,
+    in_dir: PathLike | None = None,
     venv_name: str = IDAE_VENV_DIR_NAME,
 ) -> Path:
     """Create or fetch a cached venv."""
