@@ -9,6 +9,7 @@ import pytest
 from typer.testing import CliRunner
 
 from idae.cli import cli
+from pathlib import Path
 
 runner = CliRunner(mix_stderr=False)
 
@@ -105,6 +106,24 @@ def test_clean_venvs(capfd):
     )
     assert result.exit_code == 0
     assert not CACHE_DIR.exists()
+
+
+def test_use_current_dir(capfd):
+    old_files = set(Path().iterdir())
+
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py", "--use-cwd"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out.replace("\r", "") == EXAMPLE_OUTPUT
+
+    new_files = set(Path().iterdir())
+    assert len(new_files - old_files) == 1
+    shutil.rmtree((new_files - old_files).pop())
 
 
 @pytest.mark.usefixtures("empty_cache")

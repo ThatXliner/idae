@@ -1,4 +1,5 @@
 """CLI interface."""
+
 import itertools
 import platform
 import shlex
@@ -71,6 +72,18 @@ def run(  # noqa: PLR0913
             help="Force idae to use a specific Python version",
         ),
     ] = None,
+    in_dir: Annotated[
+        Optional[str],  # noqa: FA100
+        typer.Option(
+            "--in-dir",
+            "--in-cwd",
+            "-c",
+            help="Create the venv in the specified directory if this flag is specified "
+            "[default: the system cache directory if not specified "
+            "and the current working directory if no argument is provided]",
+            show_default=False,
+        ),
+    ] = None,
 ) -> None:
     """Automatically install necessary dependencies to run a Python script.
 
@@ -108,7 +121,7 @@ def run(  # noqa: PLR0913
         ):
             python = get_python_or_exit(pyproject["requires-python"], console)
 
-    venv_path = get_venv(script_deps, python)
+    venv_path = get_venv(script_deps, python, in_dir)
 
     extra_flags = list(
         itertools.chain.from_iterable(
