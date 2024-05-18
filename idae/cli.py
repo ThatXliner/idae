@@ -1,4 +1,5 @@
 """CLI interface."""
+
 import itertools
 import platform
 import shlex
@@ -15,7 +16,7 @@ from rich.console import Console
 
 from idae.pep723 import read
 from idae.resolver import get_python_or_exit
-from idae.venv import Python, clean_venvs, get_venv
+from idae.venv import IDAE_VENV_DIR_NAME, Python, clean_venvs, get_venv
 
 if sys.version_info < (3, 9):  # pragma: no cover
     from typing_extensions import Annotated
@@ -71,6 +72,15 @@ def run(  # noqa: PLR0913
             help="Force idae to use a specific Python version",
         ),
     ] = None,
+    in_cwd: Annotated[
+        bool,
+        typer.Option(
+            "--in-cwd",
+            "-c",
+            help=f"Create the venv in a {IDAE_VENV_DIR_NAME} in the current "
+            "working directory",
+        ),
+    ] = False,
 ) -> None:
     """Automatically install necessary dependencies to run a Python script.
 
@@ -108,7 +118,7 @@ def run(  # noqa: PLR0913
         ):
             python = get_python_or_exit(pyproject["requires-python"], console)
 
-    venv_path = get_venv(script_deps, python)
+    venv_path = get_venv(script_deps, python, Path.cwd() if in_cwd else None)
 
     extra_flags = list(
         itertools.chain.from_iterable(

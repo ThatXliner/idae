@@ -3,6 +3,7 @@ import platform
 import shutil
 import sys
 import time
+from pathlib import Path
 
 import platformdirs
 import pytest
@@ -48,6 +49,8 @@ CACHE_DIR = platformdirs.user_cache_path("idae")
 def empty_cache() -> None:
     if CACHE_DIR.is_dir():
         shutil.rmtree(CACHE_DIR, ignore_errors=True)
+    if Path(".idae").is_dir():
+        shutil.rmtree(Path(".idae"), ignore_errors=True)
 
 
 @pytest.mark.usefixtures("empty_cache")
@@ -105,6 +108,24 @@ def test_clean_venvs(capfd):
     )
     assert result.exit_code == 0
     assert not CACHE_DIR.exists()
+
+
+@pytest.mark.usefixtures("empty_cache")
+def test_use_current_dir(capfd):
+    old_files = set(Path().iterdir())
+
+    result = runner.invoke(
+        cli,
+        ["tests/examples/rich_requests.py", "--in-cwd"],
+    )
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    # We have to use this instead of result.stdout
+    # As Click doesn't capture the stdin fileno
+    assert out.replace("\r", "") == EXAMPLE_OUTPUT
+
+    new_files = set(Path().iterdir())
+    assert Path(".idae") in new_files - old_files
 
 
 @pytest.mark.usefixtures("empty_cache")

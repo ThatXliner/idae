@@ -1,4 +1,5 @@
 """Utils for venv creation."""
+
 from __future__ import annotations
 
 import platform
@@ -19,6 +20,7 @@ if TYPE_CHECKING:  # pragma: no cover
 from .dependencies import hash_dependencies
 
 CACHE_DIR = platformdirs.user_cache_path("idae")
+IDAE_VENV_DIR_NAME = ".idae"
 
 
 @dataclass
@@ -29,10 +31,19 @@ class Python:
     executable: str | PathLike[str]
 
 
-def get_venv(requirements: list[Requirement], python: Python) -> Path:
+def get_venv(
+    requirements: list[Requirement],
+    python: Python,
+    in_dir: PathLike | None = None,
+    venv_name: str = IDAE_VENV_DIR_NAME,
+) -> Path:
     """Create or fetch a cached venv."""
     dep_hash = hash_dependencies(requirements)
-    venv_path = CACHE_DIR / f"{python.version.major}.{python.version.minor}" / dep_hash
+    venv_path = (
+        (in_dir / venv_name if in_dir is not None else CACHE_DIR)
+        / f"{python.version.major}.{python.version.minor}"
+        / dep_hash
+    )
     if venv_path.is_dir():
         return venv_path
     # This automatically includes pip
