@@ -7,12 +7,12 @@ import shutil
 import subprocess
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
-from pathlib import Path
 
 import platformdirs
 
 if TYPE_CHECKING:  # pragma: no cover
     from os import PathLike
+    from pathlib import Path
 
     from packaging.requirements import Requirement
     from packaging.version import Version

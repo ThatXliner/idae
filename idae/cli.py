@@ -16,7 +16,7 @@ from rich.console import Console
 
 from idae.pep723 import read
 from idae.resolver import get_python_or_exit
-from idae.venv import Python, clean_venvs, get_venv, IDAE_VENV_DIR_NAME
+from idae.venv import IDAE_VENV_DIR_NAME, Python, clean_venvs, get_venv
 
 if sys.version_info < (3, 9):  # pragma: no cover
     from typing_extensions import Annotated

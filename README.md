@@ -49,6 +49,7 @@ If you need to pass arguments that look like options for `idae` to the script yo
 ```python
 # script.py
 import sys
+
 print(" ".join(sys.argv[1:]))
 ```
 

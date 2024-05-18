@@ -3,13 +3,13 @@ import platform
 import shutil
 import sys
 import time
+from pathlib import Path
 
 import platformdirs
 import pytest
 from typer.testing import CliRunner
 
 from idae.cli import cli
-from pathlib import Path
 
 runner = CliRunner(mix_stderr=False)
 
