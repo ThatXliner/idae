@@ -54,6 +54,7 @@ def run(  # noqa: PLR0913
         bool,
         typer.Option(
             "-i",
+            "--ignore-version",
             help="Ignore Python version requirements specified in the script",
         ),
     ] = False,
