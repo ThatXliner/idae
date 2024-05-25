@@ -45,7 +45,7 @@ CACHE_DIR = platformdirs.user_cache_path("idae")
 
 
 @pytest.fixture()
-def empty_cache() -> None:
+def empty_cache() -> None:  # noqa: PT004
     if CACHE_DIR.is_dir():
         shutil.rmtree(CACHE_DIR, ignore_errors=True)
 

@@ -41,7 +41,7 @@ pytest-cov = "^4.1.0"
 shed = "^0.10.9"
 
 toml = "^0.10.2"
-ruff = "^0.0.282"
+ruff = "^0.4.5"
 
 [tool.poe.tasks]
 # Code linting
@@ -80,6 +80,10 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 # Same as Black.
 line-length = 88
+target-version = "py38"
+extend-exclude = ["tests/examples/*.py"]
+
+[tool.ruff.lint]
 select = ["ALL"]
 ignore = [
     # "D",    # "No docs"
@@ -93,9 +97,7 @@ ignore = [
     "D213",
     "FIX002", # `TODO` comments are fine when linking to issues
 ]
-target-version = "py38"
-extend-exclude = ["tests/examples/*.py"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101", "D", "ANN201"]
 "docs/conf.py" = ["INP001", "A001"]
