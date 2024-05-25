@@ -1,4 +1,5 @@
 """Utils for venv creation."""
+
 from __future__ import annotations
 
 import platform
@@ -27,6 +28,11 @@ class Python:
 
     version: Version
     executable: str | PathLike[str]
+
+
+def is_python_cached(python: str) -> bool:
+    """Check if a Python version is cached."""
+    return (CACHE_DIR / f"{python.version.major}.{python.version.minor}").is_dir()
 
 
 def get_venv(requirements: list[Requirement], python: Python) -> Path:
