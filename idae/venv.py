@@ -30,7 +30,7 @@ class Python:
     executable: str | PathLike[str]
 
 
-def is_python_cached(python: str) -> bool:
+def is_python_cached(python: Python) -> bool:
     """Check if a Python version is cached."""
     return (CACHE_DIR / f"{python.version.major}.{python.version.minor}").is_dir()
 

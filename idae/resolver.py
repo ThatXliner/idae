@@ -50,7 +50,7 @@ def get_python(
         if python_version in target:
             if use_latest:
                 return python
-            if is_python_cached(python.version) and cached_candidates is None:
+            if is_python_cached(python) and cached_candidates is None:
                 cached_candidates = python
             elif uncached_candidates is None:
                 uncached_candidates = python
