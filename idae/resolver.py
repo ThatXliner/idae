@@ -16,7 +16,7 @@ from .venv import is_python_cached
 def get_python_or_exit(
     version: str,
     console: Console,
-    use_latest: bool,
+    use_latest: bool = False,
 ) -> findpython.PythonVersion:
     """Return a PythonVersion or raise Exit."""
     try:
@@ -32,7 +32,7 @@ def get_python_or_exit(
 
 def get_python(
     version: str,
-    use_latest: bool = True,
+    use_latest: bool = False,
 ) -> findpython.PythonVersion | None:
     """Resolve the version string and return a valid Python."""
     # Order from latest version to earliest
