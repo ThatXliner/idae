@@ -234,3 +234,24 @@ class TestForceFlags:
         )
         assert result.exit_code == 1
         assert "not found" in result.stderr
+
+
+@pytest.mark.usefixtures("empty_cache")
+def test_python_resolver(capfd):
+    python_version = "3.6"  # an egregiously low Python version
+    result = runner.invoke(
+        cli,
+        [
+            "--force-version",
+            python_version,
+            "tests/examples/no_dep_cacher.py",
+        ],
+    )
+    assert result.exit_code == 0
+    out, _ = capfd.readouterr()
+    assert out.replace("\r", "") == "Success\n"
+    print(list(CACHE_DIR.glob("*")))
+    result = runner.invoke(cli, ["tests/examples/pyver_echo.py"])
+    assert result.exit_code == 0
+    out, _ = capfd.readouterr()
+    assert out.replace("\r", "") == python_version + "\n"

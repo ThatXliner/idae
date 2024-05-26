@@ -1,4 +1,5 @@
 """CLI interface."""
+
 import itertools
 import platform
 import shlex
@@ -52,8 +53,8 @@ def run(  # noqa: PLR0913
     ignore_version: Annotated[
         bool,
         typer.Option(
-            "--ignore-version",
             "-i",
+            "--ignore-version",
             help="Ignore Python version requirements specified in the script",
         ),
     ] = False,
@@ -71,6 +72,14 @@ def run(  # noqa: PLR0913
             help="Force idae to use a specific Python version",
         ),
     ] = None,
+    use_latest: Annotated[
+        bool,
+        typer.Option(
+            "-l",
+            help="Use the latest Python version that satisfies the "
+            "script's requirements",
+        ),
+    ] = False,
 ) -> None:
     """Automatically install necessary dependencies to run a Python script.
 
@@ -93,7 +102,7 @@ def run(  # noqa: PLR0913
         executable=sys.executable,
     )
     if force_version is not None:
-        python = get_python_or_exit(force_version, console)
+        python = get_python_or_exit(force_version, console, use_latest)
     if pyproject is not None:
         script_deps = (
             []
