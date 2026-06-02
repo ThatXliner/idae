@@ -13,7 +13,7 @@ from typer.testing import CliRunner
 from idae.cli import cli
 from idae.venv import Python, get_venv, is_venv_usable
 
-runner = CliRunner(mix_stderr=False)
+runner = CliRunner()
 
 CACHE_DIR = platformdirs.user_cache_path("idae")
 

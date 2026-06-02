@@ -10,7 +10,7 @@ from typer.testing import CliRunner
 
 from idae.cli import cli
 
-runner = CliRunner(mix_stderr=False)
+runner = CliRunner()
 
 EXAMPLE_OUTPUT = """[
 │   ('1', 'PEP Purpose and Guidelines'),
