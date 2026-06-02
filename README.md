@@ -1,6 +1,12 @@
-# Idae
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/Dark-Banner.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/Light-Banner.svg">
+    <img src="https://raw.githubusercontent.com/ThatXliner/idae/main/assets/Light-Banner.svg" alt="Idae — run PEP 723 scripts" width="640">
+  </picture>
+</p>
 
-<img src="https://raw.githubusercontent.com/ThatXliner/idae/main/assets/logo.svg" alt="Idae logo" width="120" align="right">
+# Idae
 
 [![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
