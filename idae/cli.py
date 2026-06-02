@@ -1,5 +1,6 @@
 """CLI interface."""
 import itertools
+import logging
 import platform
 import shlex
 import subprocess
@@ -12,6 +13,7 @@ from click.exceptions import UsageError
 from packaging.requirements import Requirement
 from packaging.version import Version
 from rich.console import Console
+from rich.logging import RichHandler
 
 from idae.dependencies import hash_dependencies
 from idae.pep723 import read
@@ -25,6 +27,22 @@ else:
 cli = typer.Typer()
 
 console = Console(stderr=True)
+logger = logging.getLogger("idae")
+
+
+def _setup_logging(verbose: int) -> None:
+    """Configure logging from a -v count (0=warning, 1=info, 2+=debug)."""
+    level = logging.WARNING
+    if verbose == 1:
+        level = logging.INFO
+    elif verbose >= 2:  # noqa: PLR2004
+        level = logging.DEBUG
+    logging.basicConfig(
+        level=level,
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler(console=console, show_path=False, rich_tracebacks=True)],
+    )
 
 
 @cli.command(context_settings={"ignore_unknown_options": True})
@@ -82,11 +100,21 @@ def run(  # noqa: PLR0913
             resolve_path=True,
         ),
     ] = None,
+    verbose: Annotated[
+        int,
+        typer.Option(
+            "--verbose",
+            "-v",
+            count=True,
+            help="Increase verbosity (-v for info, -vv for debug + pip output)",
+        ),
+    ] = 0,
 ) -> None:
     """Automatically install necessary dependencies to run a Python script.
 
     --clean can be used without 'SCRIPT'
     """
+    _setup_logging(verbose)
     if clean:
         clean_venvs()
     if script is None:
@@ -134,6 +162,7 @@ def run(  # noqa: PLR0913
             map(shlex.split, args or []),
         ),
     )
+    logger.info("Running %s with %s", script, python.version)
     # Run the script inside the venv
     raise typer.Exit(
         code=subprocess.run(
