@@ -85,10 +85,18 @@ def _populate_venv(
     # - https://docs.python.org/3/library/venv.html#how-venvs-work
 
 
-def get_venv(requirements: list[Requirement], python: Python) -> Path:
-    """Create or fetch a cached venv."""
+def get_venv(
+    requirements: list[Requirement],
+    python: Python,
+    venv_dir: Path | None = None,
+) -> Path:
+    """Create or fetch a cached venv.
+
+    When ``venv_dir`` is given, the venv lives there instead of the global
+    cache (issue #15).
+    """
     dep_hash = hash_dependencies(requirements)
-    venv_path = cache_venv_path(dep_hash, python)
+    venv_path = venv_dir if venv_dir is not None else cache_venv_path(dep_hash, python)
     if venv_path.is_dir():
         if is_venv_usable(venv_path):
             return venv_path

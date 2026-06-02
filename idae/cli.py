@@ -72,6 +72,16 @@ def run(  # noqa: PLR0913
             help="Force idae to use a specific Python version",
         ),
     ] = None,
+    venv_dir: Annotated[
+        Optional[Path],  # noqa: FA100
+        typer.Option(
+            "--venv-dir",
+            help="Create/reuse the venv at this directory instead of the cache",
+            file_okay=False,
+            dir_okay=True,
+            resolve_path=True,
+        ),
+    ] = None,
 ) -> None:
     """Automatically install necessary dependencies to run a Python script.
 
@@ -112,7 +122,7 @@ def run(  # noqa: PLR0913
             dep_hash=dep_hash,
         )
 
-    venv_path = get_venv(script_deps, python)
+    venv_path = get_venv(script_deps, python, venv_dir=venv_dir)
 
     extra_flags = list(
         itertools.chain.from_iterable(
