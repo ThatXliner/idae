@@ -1,0 +1,21 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Idae logo">
+  <title>Idae</title>
+  <defs>
+    <linearGradient id="idae-bg" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFD43B"/>
+      <stop offset="1" stop-color="#FFB703"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="44" fill="#2B6CB0"/>
+  <!-- PEP 723 inline metadata block: # /// script lines -->
+  <g font-family="ui-monospace,Menlo,Consolas,monospace" font-size="16" font-weight="600" fill="#9DC4F0">
+    <text x="40" y="58"># /// script</text>
+    <text x="40" y="80"># deps = [..]</text>
+    <text x="40" y="102"># ///</text>
+  </g>
+  <!-- run / play: a triangle that "runs" the script -->
+  <g>
+    <circle cx="100" cy="138" r="40" fill="url(#idae-bg)"/>
+    <polygon points="88,118 88,158 124,138" fill="#2B6CB0"/>
+  </g>
+</svg>
