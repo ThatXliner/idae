@@ -13,6 +13,7 @@ from packaging.requirements import Requirement
 from packaging.version import Version
 from rich.console import Console
 
+from idae.dependencies import hash_dependencies
 from idae.pep723 import read
 from idae.resolver import get_python_or_exit
 from idae.venv import Python, clean_venvs, get_venv
@@ -92,21 +93,24 @@ def run(  # noqa: PLR0913
         ),
         executable=sys.executable,
     )
-    if force_version is not None:
-        python = get_python_or_exit(force_version, console)
     if pyproject is not None:
         script_deps = (
             []
             if "dependencies" not in pyproject
             else list(map(Requirement, pyproject["dependencies"]))
         )
-
-        if (
-            not ignore_version
-            and force_version is None
-            and "requires-python" in pyproject
-        ):
-            python = get_python_or_exit(pyproject["requires-python"], console)
+    dep_hash = hash_dependencies(script_deps)
+    if force_version is not None:
+        python = get_python_or_exit(force_version, console)
+    elif (
+        not ignore_version and pyproject is not None and "requires-python" in pyproject
+    ):
+        # Prefer an existing cached venv whose Python satisfies the clause (#14)
+        python = get_python_or_exit(
+            pyproject["requires-python"],
+            console,
+            dep_hash=dep_hash,
+        )
 
     venv_path = get_venv(script_deps, python)
 
