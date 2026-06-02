@@ -13,22 +13,16 @@ There are many ways you can contribute :smile:
 
 Remember to follow the [code of conduct](./CODE_OF_CONDUCT.md)
 
-We use [Poetry](https://python-poetry.org) to manage the project so [make sure you have it](https://python-poetry.org/docs/#installation). Once you do, set up the virtual environment after you cloned repo
+We use [uv](https://docs.astral.sh/uv) to manage the project so [make sure you have it](https://docs.astral.sh/uv/getting-started/installation/). Once you do, set up the virtual environment after you cloned repo
 
 ```
-$ poetry install
+$ uv sync
 ```
 
 You can test locally with
 
 ```
-$ poe test
-```
-
-Or (if you don't have [Poe the poet](https://github.com/nat-n/poethepoet))
-
-```
-$ poetry run pytest
+$ uv run pytest
 ```
 
 <h2 id="pr">Pull Request contributing guide</h2>
@@ -101,18 +95,15 @@ We use the linters Black, Pylint, and MyPy. We use the formatters Black and Isor
 You can easily fix your code's style with
 
 ```
-$ poe format
-```
-
-or
-```
-$ shed {{ cookiecutter.module_name }}/**.py
+$ uv run shed
 ```
 
 You can run the linters via
 
 ```
-$ poe lint
+$ uv run black idae --check
+$ uv run ruff check idae
+$ uv run mypy idae --strict
 ```
 
 Try to follow [my recommended code style](https://github.com/ThatXliner/Significant-files/blob/main/PYTHON_STYLE.md) or [Google's Style Guide](https://google.github.io/styleguide/pyguide.html)
