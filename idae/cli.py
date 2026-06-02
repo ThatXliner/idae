@@ -1,5 +1,6 @@
 """CLI interface."""
 import itertools
+import logging
 import platform
 import shlex
 import subprocess
@@ -12,7 +13,9 @@ from click.exceptions import UsageError
 from packaging.requirements import Requirement
 from packaging.version import Version
 from rich.console import Console
+from rich.logging import RichHandler
 
+from idae.dependencies import hash_dependencies
 from idae.pep723 import read
 from idae.resolver import get_python_or_exit
 from idae.venv import Python, clean_venvs, get_venv
@@ -24,6 +27,22 @@ else:
 cli = typer.Typer()
 
 console = Console(stderr=True)
+logger = logging.getLogger("idae")
+
+
+def _setup_logging(verbose: int) -> None:
+    """Configure logging from a -v count (0=warning, 1=info, 2+=debug)."""
+    level = logging.WARNING
+    if verbose == 1:
+        level = logging.INFO
+    elif verbose >= 2:  # noqa: PLR2004
+        level = logging.DEBUG
+    logging.basicConfig(
+        level=level,
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler(console=console, show_path=False, rich_tracebacks=True)],
+    )
 
 
 @cli.command(context_settings={"ignore_unknown_options": True})
@@ -71,11 +90,31 @@ def run(  # noqa: PLR0913
             help="Force idae to use a specific Python version",
         ),
     ] = None,
+    venv_dir: Annotated[
+        Optional[Path],  # noqa: FA100
+        typer.Option(
+            "--venv-dir",
+            help="Create/reuse the venv at this directory instead of the cache",
+            file_okay=False,
+            dir_okay=True,
+            resolve_path=True,
+        ),
+    ] = None,
+    verbose: Annotated[
+        int,
+        typer.Option(
+            "--verbose",
+            "-v",
+            count=True,
+            help="Increase verbosity (-v for info, -vv for debug + pip output)",
+        ),
+    ] = 0,
 ) -> None:
     """Automatically install necessary dependencies to run a Python script.
 
     --clean can be used without 'SCRIPT'
     """
+    _setup_logging(verbose)
     if clean:
         clean_venvs()
     if script is None:
@@ -92,23 +131,26 @@ def run(  # noqa: PLR0913
         ),
         executable=sys.executable,
     )
-    if force_version is not None:
-        python = get_python_or_exit(force_version, console)
     if pyproject is not None:
         script_deps = (
             []
             if "dependencies" not in pyproject
             else list(map(Requirement, pyproject["dependencies"]))
         )
+    dep_hash = hash_dependencies(script_deps)
+    if force_version is not None:
+        python = get_python_or_exit(force_version, console)
+    elif (
+        not ignore_version and pyproject is not None and "requires-python" in pyproject
+    ):
+        # Prefer an existing cached venv whose Python satisfies the clause (#14)
+        python = get_python_or_exit(
+            pyproject["requires-python"],
+            console,
+            dep_hash=dep_hash,
+        )
 
-        if (
-            not ignore_version
-            and force_version is None
-            and "requires-python" in pyproject
-        ):
-            python = get_python_or_exit(pyproject["requires-python"], console)
-
-    venv_path = get_venv(script_deps, python)
+    venv_path = get_venv(script_deps, python, venv_dir=venv_dir)
 
     extra_flags = list(
         itertools.chain.from_iterable(
@@ -120,6 +162,7 @@ def run(  # noqa: PLR0913
             map(shlex.split, args or []),
         ),
     )
+    logger.info("Running %s with %s", script, python.version)
     # Run the script inside the venv
     raise typer.Exit(
         code=subprocess.run(
