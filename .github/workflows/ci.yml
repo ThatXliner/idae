@@ -5,8 +5,6 @@ on:
   # This way, we can make sure code doesn't break via external dependencies
   push:
   pull_request:
-env:
-  POETRY_VERSION: 1.6.0
 jobs:
   test:
     strategy:
@@ -28,53 +26,30 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v4
-        with:
-          path: |
-            .venv
-            .pytest_cache
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - uses: astral-sh/setup-uv@v8
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.3.2
         with:
           version: "0.13.4"
-      - name: Install Poetry and Poe (UNIX)
-        if: runner.os != 'Windows'
-        run: uv pip install --system "poetry==$POETRY_VERSION" poethepoet "certifi>=2026.10.19"
-      - name: Install Poetry and Poe (Windows)
-        if: runner.os == 'Windows'
-        run: uv pip install --system "poetry==$env:POETRY_VERSION" poethepoet "certifi>=2026.10.19"
-
+          enable-cache: true
+      - name: Set up Python ${{ matrix.python-version }}
+        run: echo "${{ matrix.python-version }}" > .python-version
       - name: Install dependencies
-        run: |
-          poetry config virtualenvs.in-project true
-          poetry install
-          poetry install  # Second time to install the project
+        run: uv sync --frozen
       - name: Run test suite
-        run: poe ci
+        run: uv run --frozen pytest -vvv --cov=idae --cov-report=xml
       - name: Upload to CodeCov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v4
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3
-      - uses: astral-sh/setup-uv@v8
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.3.2
         with:
           version: "0.13.4"
-      - name: Install Poetry $POETRY_VERSION
-        run: uv pip install --system "poetry==$POETRY_VERSION" "certifi>=2026.10.19"
       - name: Build project
-        run: poetry build
+        run: uv build
       - name: Test fresh wheel installation
         run: |
           uv venv .release-smoke
@@ -85,30 +60,18 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3
-      - uses: actions/cache@v4
-        with:
-          path: .venv
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - uses: astral-sh/setup-uv@v8
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.3.2
         with:
           version: "0.13.4"
+          enable-cache: true
       - name: Install dependencies
-        run: |
-          uv pip install --system "poetry==$POETRY_VERSION" poethepoet "certifi>=2026.10.19"
-          poetry config virtualenvs.in-project true
-          poetry install
-          poetry install  # Second time to install the project
-
+        run: uv sync --frozen
       - name: Run style lints
-        run: poe style
+        run: |
+          uv run --frozen black idae --check
+          uv run --frozen ruff check idae --select I
       - name: Run ruff lints
-        run: poe ruff
+        run: uv run --frozen ruff check idae
       - name: Run mypy lints
-        run: poe mypy
+        run: uv run --frozen mypy idae --strict
