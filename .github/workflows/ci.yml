@@ -5,8 +5,6 @@ on:
   # This way, we can make sure code doesn't break via external dependencies
   push:
   pull_request:
-env:
-  POETRY_VERSION: 1.6.0
 jobs:
   test:
     strategy:
@@ -27,74 +25,44 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v3
-        with:
-          path: |
-            .venv
-            .pytest_cache
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install Poetry and Poe (UNIX)
-        if: runner.os != 'Windows'
-        run: python3 -m pip install poetry==$POETRY_VERSION poethepoet
-      - name: Install Poetry and Poe (Windows)
-        if: runner.os == 'Windows'
-        run: python -m pip install poetry==$env:POETRY_VERSION poethepoet
-
+        run: echo "${{ matrix.python-version }}" > .python-version
       - name: Install dependencies
-        run: |
-          poetry config virtualenvs.in-project true
-          poetry install
-          poetry install  # Second time to install the project
+        run: uv sync
       - name: Run test suite
-        run: poe ci
+        run: uv run pytest -vvv --cov=idae --cov-report=xml
       - name: Upload to CodeCov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v4
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3
-      - name: Install Poetry $POETRY_VERSION
-        run: python3 -m pip install --upgrade pip poetry==$POETRY_VERSION
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Build project
-        run: poetry build
+        run: uv build
   lints:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: 3
-      - uses: actions/cache@v3
-        with:
-          path: .venv
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
+          enable-cache: true
       - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip poetry==$POETRY_VERSION poethepoet
-          poetry config virtualenvs.in-project true
-          poetry install
-          poetry install  # Second time to install the project
-
+        run: uv sync
       - name: Run style lints
-        run: poe style
+        run: |
+          uv run black idae --check
+          uv run ruff check idae --select I
       - name: Run ruff lints
-        run: poe ruff
+        run: uv run ruff check idae
       - name: Run mypy lints
-        run: poe mypy
+        run: uv run mypy idae --strict
