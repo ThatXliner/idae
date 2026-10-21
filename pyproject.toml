@@ -2,7 +2,7 @@
 name = "idae"
 description = "A PEP 772 implementation"
 authors = ["Bryan Hu <thatxliner@gmail.com>"]
-version = "1.1.1"
+version = "1.1.2"
 
 readme = "README.md"
 license = "GPL-3.0-or-later"
@@ -21,6 +21,7 @@ keywords = ["script", "cli", "python", "typer"] # Maximum of 5 keywords
 [tool.poetry.dependencies]
 python = "^3.8"
 uv = ">=0.13.4"
+click = ">=8.1.7,<8.2"
 tomli = { version = "^2.0.1", python = "<3.11" }
 platformdirs = ">=4.0.0"
 packaging = ">=23.2"
