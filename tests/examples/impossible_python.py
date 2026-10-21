@@ -3,6 +3,7 @@
 # requires-python = ">=69420"
 # dependencies = [
 #   "requests<3",
+#   "certifi>=2026.10.19",
 #   "rich",
 # ]
 # ///

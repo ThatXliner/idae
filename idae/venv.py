@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import platformdirs
+from uv import find_uv_bin
 
 if TYPE_CHECKING:  # pragma: no cover
     from os import PathLike
@@ -31,13 +32,15 @@ class Python:
 
 def get_venv(requirements: list[Requirement], python: Python) -> Path:
     """Create or fetch a cached venv."""
-    dep_hash = hash_dependencies(requirements)
+    # Do not reuse environments installed with pre-compromise bundled pip.
+    dep_hash = "tls-2026-10-19-" + hash_dependencies(requirements)
     venv_path = CACHE_DIR / f"{python.version.major}.{python.version.minor}" / dep_hash
-    if venv_path.is_dir():
+    ready = venv_path / ".idae-ready"
+    if ready.is_file():
         return venv_path
-    # This automatically includes pip
+    # Dependency installation uses the patched uv bundled with idae.
     subprocess.run(
-        [python.executable, "-m", "venv", venv_path],  # noqa: S603
+        [python.executable, "-m", "venv", "--without-pip", venv_path],  # noqa: S603
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         check=True,
@@ -46,12 +49,13 @@ def get_venv(requirements: list[Requirement], python: Python) -> Path:
     if requirements:
         subprocess.run(
             [  # noqa: S603
-                (
-                    venv_path
-                    / ("Scripts" if platform.system() == "Windows" else "bin")
-                    / "pip"
-                ).resolve(),
+                find_uv_bin(),
+                "pip",
                 "install",
+                "--python",
+                venv_path
+                / ("Scripts" if platform.system() == "Windows" else "bin")
+                / "python",
                 *map(str, requirements),
             ],
             stdout=subprocess.PIPE,
@@ -64,6 +68,7 @@ def get_venv(requirements: list[Requirement], python: Python) -> Path:
     # > when invoking Python. Furthermore, all scripts installed in the environment
     # > should be runnable without activating it.
     # - https://docs.python.org/3/library/venv.html#how-venvs-work
+    ready.touch()
     return venv_path
 
 
