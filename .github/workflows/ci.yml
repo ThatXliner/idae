@@ -75,6 +75,11 @@ jobs:
         run: uv pip install --system "poetry==$POETRY_VERSION" "certifi>=2026.10.19"
       - name: Build project
         run: poetry build
+      - name: Test fresh wheel installation
+        run: |
+          uv venv .release-smoke
+          uv pip install --python .release-smoke/bin/python dist/*.whl
+          .release-smoke/bin/idae --help
   lints:
     runs-on: ubuntu-latest
     steps:
