@@ -231,10 +231,12 @@ def test_concurrent_cold_cache(tmp_path):
             subprocess.Popen(
                 [sys.executable, "-m", "idae", str(script)],  # noqa: S603
                 stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
+                stderr=subprocess.PIPE,
                 text=True,
             )
             for _ in range(6)
         ]
-        results = [(proc.communicate()[0], proc.returncode) for proc in procs]
-        assert results == [("ok\n", 0)] * 6
+        results = [(*proc.communicate(), proc.returncode) for proc in procs]
+        assert [(out, code) for out, _, code in results] == [("ok\n", 0)] * 6, [
+            err for _, err, _ in results
+        ]
