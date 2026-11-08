@@ -196,7 +196,7 @@ class TestForceFlags:
             cli,
             [
                 "--force-version",
-                ".".join(map(str, sys.version_info[:2])),
+                "=={}.{}.*".format(*sys.version_info[:2]),
                 "tests/examples/impossible_python.py",
             ],
         )
