@@ -1,6 +1,7 @@
 # ruff: noqa: ANN003, ANN002, ANN001, ANN201
 import platform
 import shutil
+import subprocess
 import sys
 
 import platformdirs
@@ -216,3 +217,24 @@ class TestForceFlags:
         )
         assert result.exit_code == 1
         assert "not found" in result.stderr
+
+
+def test_concurrent_cold_cache(tmp_path):
+    script = tmp_path / "script.py"
+    script.write_text(
+        '# /// script\n# dependencies = ["requests", "rich"]\n# ///\n'
+        'import requests, rich\nprint("ok")\n',
+    )
+    for _ in range(3):
+        shutil.rmtree(CACHE_DIR, ignore_errors=True)
+        procs = [
+            subprocess.Popen(
+                [sys.executable, "-m", "idae", str(script)],  # noqa: S603
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            for _ in range(6)
+        ]
+        results = [(proc.communicate()[0], proc.returncode) for proc in procs]
+        assert results == [("ok\n", 0)] * 6
