@@ -4,17 +4,21 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import os
 import platform
 import shutil
 import subprocess
+import sys
+import time
+from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import platformdirs
-from filelock import FileLock, Timeout
 from uv import find_uv_bin
 
 if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Iterator
     from os import PathLike
     from pathlib import Path
 
@@ -71,17 +75,45 @@ def get_venv(
     # The lock lives outside the venv, which gets rmtree'd on rebuild.
     digest = hashlib.sha256(str(venv_path.resolve()).encode()).hexdigest()
     lock_path = CACHE_DIR / "locks" / f"{digest}.lock"
-    lock_path.parent.mkdir(parents=True, exist_ok=True)
-    lock = FileLock(lock_path)
-    try:
-        lock.acquire(timeout=0)
-    except Timeout:
-        logger.info("Waiting for another idae process to set up %s", venv_path)
-        lock.acquire()
-    try:
+    with _exclusive_lock(lock_path, venv_path):
         return _ensure_venv(requirements, python, venv_path, key, venv_dir)
+
+
+@contextmanager
+def _exclusive_lock(lock_path: Path, venv_path: Path) -> Iterator[None]:
+    """Hold an OS-level exclusive lock on ``lock_path``, released on exit."""
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    flags = os.O_RDWR | os.O_CREAT | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(lock_path, flags, 0o600)
+    waiting = False
+    try:
+        while True:
+            try:
+                if sys.platform == "win32":
+                    import msvcrt
+
+                    msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+                else:
+                    import fcntl
+
+                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except OSError:
+                if not waiting:
+                    logger.info(
+                        "Waiting for another idae process to set up %s",
+                        venv_path,
+                    )
+                    waiting = True
+                time.sleep(0.1)
+        try:
+            yield
+        finally:
+            if sys.platform == "win32":
+                # Windows does not promise to release a lock promptly on close.
+                msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
     finally:
-        lock.release()
+        os.close(fd)
 
 
 def _ensure_venv(
