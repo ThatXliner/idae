@@ -2,6 +2,7 @@
 
 Copy+pasted from the PEP 723 reference implementation
 """
+
 from __future__ import annotations
 
 import re

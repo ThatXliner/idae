@@ -2,7 +2,6 @@
 import platform
 import shutil
 import sys
-import time
 
 import platformdirs
 import pytest
@@ -120,58 +119,41 @@ def test_ignore_version(capfd):
     assert out.replace("\r", "") == EXAMPLE_OUTPUT
 
 
+def run_rich_requests(capfd, *args):
+    result = runner.invoke(cli, ["tests/examples/rich_requests.py", *args])
+    out, _ = capfd.readouterr()
+    assert result.exit_code == 0
+    assert out.replace("\r", "") == EXAMPLE_OUTPUT
+
+
+def cached_venvs():
+    return [marker.parent for marker in CACHE_DIR.rglob(".idae-ready")]
+
+
 @pytest.mark.usefixtures("empty_cache")
 def test_caching(capfd):
-    start = time.time()
-    result = runner.invoke(
-        cli,
-        ["tests/examples/rich_requests.py"],
-    )
-    out, _ = capfd.readouterr()
-    assert result.exit_code == 0
-    assert out.replace("\r", "") == EXAMPLE_OUTPUT
-    without_cache = time.time() - start
-    start = time.time()
-    result = runner.invoke(
-        cli,
-        ["tests/examples/rich_requests.py"],
-    )
-    out, _ = capfd.readouterr()
-    assert result.exit_code == 0
-    assert out.replace("\r", "") == EXAMPLE_OUTPUT
-    assert time.time() - start < without_cache
+    run_rich_requests(capfd)
+    [venv] = cached_venvs()
+    built = (venv / ".idae-ready").stat()
+
+    run_rich_requests(capfd)
+    assert cached_venvs() == [venv]
+    reused = (venv / ".idae-ready").stat()
+    assert (reused.st_ino, reused.st_mtime_ns) == (
+        built.st_ino,
+        built.st_mtime_ns,
+    ), "second run reused the cached venv without rebuilding it"
 
 
 @pytest.mark.usefixtures("empty_cache")
 def test_clean_cache(capfd):
-    # Initial to fill up cache
-    result = runner.invoke(
-        cli,
-        ["tests/examples/rich_requests.py"],
-    )
-    out, _ = capfd.readouterr()
-    assert result.exit_code == 0
-    assert out.replace("\r", "") == EXAMPLE_OUTPUT
+    run_rich_requests(capfd)
+    [venv] = cached_venvs()
+    (venv / "sentinel").touch()
 
-    start = time.time()
-    result = runner.invoke(
-        cli,
-        ["tests/examples/rich_requests.py"],
-    )
-    out, _ = capfd.readouterr()
-    assert result.exit_code == 0
-    assert out.replace("\r", "") == EXAMPLE_OUTPUT
-    with_cache = time.time() - start
-
-    start = time.time()
-    result = runner.invoke(
-        cli,
-        ["tests/examples/rich_requests.py", "--clean"],
-    )
-    out, _ = capfd.readouterr()
-    assert result.exit_code == 0
-    assert out.replace("\r", "") == EXAMPLE_OUTPUT
-    assert time.time() - start > with_cache
+    run_rich_requests(capfd, "--clean")
+    assert cached_venvs() == [venv]
+    assert not (venv / "sentinel").exists(), "--clean rebuilt the venv"
 
 
 @pytest.mark.usefixtures("empty_cache")
@@ -218,7 +200,7 @@ class TestForceFlags:
             cli,
             [
                 "--force-version",
-                ".".join(map(str, sys.version_info[:2])),
+                "=={}.{}.*".format(*sys.version_info[:2]),
                 "tests/examples/impossible_python.py",
             ],
         )

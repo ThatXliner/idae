@@ -1,4 +1,5 @@
 """Utils for venv creation."""
+
 from __future__ import annotations
 
 import platform
@@ -53,9 +54,11 @@ def get_venv(requirements: list[Requirement], python: Python) -> Path:
                 "pip",
                 "install",
                 "--python",
-                venv_path
-                / ("Scripts" if platform.system() == "Windows" else "bin")
-                / "python",
+                (
+                    venv_path / "Scripts" / "python.exe"
+                    if platform.system() == "Windows"
+                    else venv_path / "bin" / "python"
+                ),
                 *map(str, requirements),
             ],
             stdout=subprocess.PIPE,

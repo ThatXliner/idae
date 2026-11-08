@@ -1,4 +1,5 @@
 """Dependency utils lifted from Hatch."""
+
 from __future__ import annotations
 
 import re

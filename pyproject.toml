@@ -1,11 +1,13 @@
-[tool.poetry]
+[project]
 name = "idae"
 description = "A PEP 772 implementation"
-authors = ["Bryan Hu <thatxliner@gmail.com>"]
+authors = [{ name = "Bryan Hu", email = "thatxliner@gmail.com" }]
 version = "1.1.2"
+requires-python = ">=3.8"
 
 readme = "README.md"
 license = "GPL-3.0-or-later"
+license-files = ["LICENSE.txt"]
 
 classifiers = [
     # Get the list of trove classifiers here: https://pypi.org/classifiers/
@@ -15,69 +17,46 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Natural Language :: English",
 ]
-homepage = "https://github.com/ThatXliner/idae"
 keywords = ["script", "cli", "python", "typer"] # Maximum of 5 keywords
 
-[tool.poetry.dependencies]
-python = "^3.8"
-uv = ">=0.13.4"
-click = ">=8.1.7,<8.2"
-tomli = { version = "^2.0.1", python = "<3.11" }
-platformdirs = ">=4.0.0"
-packaging = ">=23.2"
-findpython = "^0.4.0"
-typer = { extras = ["all"], version = "^0.9.0" }
-typing-extensions = { version = "^4.8.0", python = "<3.9" }
+dependencies = [
+    "uv>=0.13.4",
+    "tomli>=2.0.1,<3; python_version < '3.11'",
+    "platformdirs>=4.0.0",
+    "packaging>=23.2",
+    "findpython>=0.4.0,<0.5.0",
+    "typer[all]>=0.9.0,<0.10.0",
+    # typer 0.9 crashes on click 8.2 (TyperArgument.make_metavar signature), and
+    # cli.py imports click.exceptions directly.
+    "click>=8.1.7,<8.2",
+    "typing-extensions>=4.8.0,<5; python_version < '3.9'",
+]
 
-[tool.poetry.scripts]
+[project.urls]
+Homepage = "https://github.com/ThatXliner/idae"
+
+[project.scripts]
 idae = "idae.cli:cli"
 
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.11.0"
-hypothesis = "^6.90.0"
-mypy = "^1.7.1"
-pytest = "^7.4.3"
-pytest-clarity = { version = "^1.0.1", markers = "platform_system != 'Windows'" }
-pytest-cov = "^4.1.0"
-shed = "^0.10.9"
-
-toml = "^0.10.2"
-ruff = "^0.4.5"
-
-[tool.poe.tasks]
-# Code linting
-mypy = { cmd = "mypy idae --strict", help = "Run MyPy on codebase" }
-ruff = { cmd = "ruff check idae", help = "Run Ruff on codebase" }
-check_black = { cmd = "black idae --check" }
-check_imports = { cmd = "ruff check idae --select I" }
-style = ["check_black", "check_imports"]
-codebase = ["ruff", "mypy"]
-
-[tool.poe.tasks.format]
-cmd = "shed"
-help = "Format code"
-
-[tool.poe.tasks.fix-ruff]
-cmd = "ruff idae --fix"
-help = "Ruff autofix"
-
-[tool.poe.tasks.lint]
-sequence = ["style", "codebase"]
-help = "Lint codebase"
-
-[tool.poe.tasks.test]
-cmd = "pytest -vvv --cov=idae"
-help = "Simply run test suite"
-
-[tool.poe.tasks.ci]
-cmd = "pytest -vvv --cov=idae --cov-report=xml"
-help = "This workflow is for Github Actions"
-
+[dependency-groups]
+dev = [
+    "black>=24.3.0,<25.0.0",
+    "hypothesis>=6.90.0,<7.0.0",
+    "mypy>=1.7.1,<2.0.0",
+    "pytest>=7.4.3,<8.0.0",
+    "pytest-clarity>=1.0.1,<2.0.0; platform_system != 'Windows'",
+    "pytest-cov>=4.1.0,<5.0.0",
+    "shed>=0.10.9,<0.11.0",
+    "toml>=0.10.2,<0.11.0",
+    "ruff>=0.4.5,<0.5.0",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.13.4,<0.14"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
 
 [tool.ruff]
 # Same as Black.
@@ -101,5 +80,9 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S101", "D", "ANN201"]
+"tests/**/*.py" = ["S101", "S603", "D", "ANN201"]
 "docs/conf.py" = ["INP001", "A001"]
+
+[tool.uv]
+# Keep a pre-compromise certifi out of any environment resolved from uv.lock.
+constraint-dependencies = ["certifi>=2026.10.19"]
