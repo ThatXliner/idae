@@ -1,4 +1,5 @@
 """CLI interface."""
+
 import itertools
 import platform
 import shlex

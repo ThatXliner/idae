@@ -101,7 +101,7 @@ $ uv run shed
 You can run the linters via
 
 ```
-$ uv run black idae --check
+$ uv run black idae tests --check
 $ uv run ruff check idae
 $ uv run mypy idae --strict
 ```

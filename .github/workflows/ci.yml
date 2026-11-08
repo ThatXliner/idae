@@ -69,7 +69,7 @@ jobs:
         run: uv sync --frozen
       - name: Run style lints
         run: |
-          uv run --frozen black idae --check
+          uv run --frozen black idae tests --check
           uv run --frozen ruff check idae --select I
       - name: Run ruff lints
         run: uv run --frozen ruff check idae
