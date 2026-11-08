@@ -134,11 +134,15 @@ def cached_venvs():
 def test_caching(capfd):
     run_rich_requests(capfd)
     [venv] = cached_venvs()
-    (venv / "sentinel").touch()
+    built = (venv / ".idae-ready").stat()
 
     run_rich_requests(capfd)
     assert cached_venvs() == [venv]
-    assert (venv / "sentinel").exists(), "second run reused the cached venv"
+    reused = (venv / ".idae-ready").stat()
+    assert (reused.st_ino, reused.st_mtime_ns) == (
+        built.st_ino,
+        built.st_mtime_ns,
+    ), "second run reused the cached venv without rebuilding it"
 
 
 @pytest.mark.usefixtures("empty_cache")
